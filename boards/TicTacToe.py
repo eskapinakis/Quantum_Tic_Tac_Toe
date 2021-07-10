@@ -90,6 +90,16 @@ class SmallBoard:
         return False
 
     def isFull(self):
+
+        # if it's a regular draw
+        k = 0
+        for i in range(3):
+            for j in range(3):
+                if self.tiles[i][j] in ['X', 'O']:
+                    k += 1
+        if k == 9:
+            return True
+
         for i in range(3):
             for j in range(3):
                 if len(self.tiles[i][j]) < 5:
@@ -125,23 +135,47 @@ class SmallBoard:
         tileCoordinate = self.cycle[i]
 
         self.tiles[tileCoordinate[0]][tileCoordinate[1]] = choice[0]  # put the choice
-        self.collapseUncertaintyRecursive(choice, i - 1)
 
-    def collapseUncertaintyRecursive(self, choice, i):
+        nextTile = self.findIndex(choice[1], tileCoordinate)
+        if nextTile == self.cycle[i-1]:
+            # print("minus")
+            self.collapseUncertaintyRecursiveMinus(choice, i - 1)
+        else:
+            # print("plus")
+            self.collapseUncertaintyRecursivePlus(choice, 0)
+
+    def collapseUncertaintyRecursiveMinus(self, choice, i):
 
         if i < 0:
             return
 
         tileCoordinate = self.cycle[i]
         data = self.tiles[tileCoordinate[0]][tileCoordinate[1]]
-
         index = choice[1]  # see the index sent - says which will be removed
 
         if index == data[1]:  # if you will remove the first
             self.tiles[tileCoordinate[0]][tileCoordinate[1]] = data[3]
             data = data[3]+data[4]
-        else:  # if you will remove the second
+        elif index == data[4]:  # if you will remove the second
             self.tiles[tileCoordinate[0]][tileCoordinate[1]] = data[0]
             data = data[0] + data[1]
 
-        self.collapseUncertaintyRecursive(data, i - 1)
+        self.collapseUncertaintyRecursiveMinus(data, i - 1)
+
+    def collapseUncertaintyRecursivePlus(self, choice, i):
+
+        if i == len(self.cycle)-1:
+            return
+
+        tileCoordinate = self.cycle[i]
+        data = self.tiles[tileCoordinate[0]][tileCoordinate[1]]
+        index = choice[1]  # see the index sent - says which will be removed
+
+        if index == data[1]:  # if you will remove the first
+            self.tiles[tileCoordinate[0]][tileCoordinate[1]] = data[3]
+            data = data[3]+data[4]
+        elif index == data[4]:  # if you will remove the second
+            self.tiles[tileCoordinate[0]][tileCoordinate[1]] = data[0]
+            data = data[0] + data[1]
+
+        self.collapseUncertaintyRecursivePlus(data, i + 1)

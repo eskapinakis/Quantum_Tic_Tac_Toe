@@ -1,26 +1,29 @@
 from boards import TicTacToe as SB
 import PySimpleGUI as sg
 
-layout = [[sg.Button(' ', key='11', auto_size_button=False, size=(6, 4)),
-           sg.Button(' ', key='12', auto_size_button=False, size=(6, 4)),
-           sg.Button(' ', key='13', auto_size_button=False, size=(6, 4))],
-          [sg.Button(' ', key='21', auto_size_button=False, size=(6, 4)),
-           sg.Button(' ', key='22', auto_size_button=False, size=(6, 4)),
-           sg.Button(' ', key='23', auto_size_button=False, size=(6, 4))],
-          [sg.Button(' ', key='31', auto_size_button=False, size=(6, 4)),
-           sg.Button(' ', key='32', auto_size_button=False, size=(6, 4)),
-           sg.Button(' ', key='33', auto_size_button=False, size=(6, 4))],
-          [sg.Button('', key='v', visible=False), sg.Button('Play again', key='a', visible=False)],
-          [sg.Button(' ', key='c1', visible=False),
-           sg.Button(' ', key='c2', visible=False)]
-          ]
+
+def makeLayout():
+    return [[sg.Button('', key='11', auto_size_button=False, size=(6, 4)),
+            sg.Button('', key='12', auto_size_button=False, size=(6, 4)),
+            sg.Button('', key='13', auto_size_button=False, size=(6, 4))],
+            [sg.Button('', key='21', auto_size_button=False, size=(6, 4)),
+            sg.Button('', key='22', auto_size_button=False, size=(6, 4)),
+            sg.Button('', key='23', auto_size_button=False, size=(6, 4))],
+            [sg.Button('', key='31', auto_size_button=False, size=(6, 4)),
+            sg.Button('', key='32', auto_size_button=False, size=(6, 4)),
+            sg.Button('', key='33', auto_size_button=False, size=(6, 4))],
+            [sg.Button('', key='v', visible=False), sg.Button('Play again', key='a', visible=False)],
+            [sg.Button('', key='c1', auto_size_button=False, size=(3, 2)),
+            sg.Button('', key='c2', auto_size_button=False, size=(3, 2))]
+            ]
+
 
 sb = SB.SmallBoard()
 
 
 def printBoard(board):
-    for line in board:
-        print(line)
+    for l in board:
+        print(l)
 
 
 def checkVictory():
@@ -33,6 +36,7 @@ def checkVictory():
     return "banana"
 
 
+'''  
 def play(piece):
     while True:
         line = int(input("line: "))
@@ -44,12 +48,12 @@ def play(piece):
         else:
             sb.play(line, col, piece)
             break
-
+'''
 
 if __name__ == '__main__':
 
-    window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(100, 100),
-                       font='Any 14').Layout(layout)
+    window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
+                       size=(400, 510), font='Any 14').Layout(makeLayout())
     player = 'O'
     game = True
     choosing = False
@@ -57,7 +61,7 @@ if __name__ == '__main__':
 
     while True:
 
-        printBoard(sb.getBoard())
+        # printBoard(sb.getBoard())
 
         if index % 2 == 0:  # so each player plays twice
             player = 'X'
@@ -70,9 +74,14 @@ if __name__ == '__main__':
             break
 
         # when the player chooses a tile
-        if game and not choosing and event not in ['a', 'v'] and \
-                len(window[event].get_text()) <= 3 and checkVictory() == "banana":
-            sb.play(int(event[0]) - 1, int(event[1]) - 1, player + str(int(index)))
+        if game and not choosing and event not in ['a', 'v', 'c1', 'c2'] and \
+                len(window[event].get_text()) <= 3 and checkVictory() == "banana" and\
+                len(window[event].get_text()) != 1:
+
+            line = int(event[0]) - 1
+            col = int(event[1]) - 1
+
+            sb.play(line, col, player + str(int(index)))
             if window[event].get_text() == ' ':
                 window[event].update(text=player + str(int(index)))
             else:
@@ -81,20 +90,18 @@ if __name__ == '__main__':
 
             if index % 2 == 0 or index % 2 == 1:  # checks if there is a cycle
 
-                if sb.sameSymbol(int(event[0]) - 1, int(event[1]) - 1):
-                    window[event].update(text=window[event].get_text()[0])
+                if sb.sameSymbol(line, col):
+                    window[event].update(text=sb.getTile(line, col))
 
-                if sb.hasCycle(int(event[0]) - 1, int(event[1]) - 1):
+                if sb.hasCycle(line, col):
                     choosing = True
                     message = sb.getMessage()
                     window.FindElement('c1').Update(text=message[0])
-                    window.FindElement('c1').Update(visible=True)
                     window.FindElement('c2').Update(text=message[1])
-                    window.FindElement('c2').Update(visible=True)
-                    print(sb.getCycle())
+                    # print(sb.getCycle())
             window.Refresh()
 
-        if event in ['c1', 'c2']:
+        if event in ['c1', 'c2'] and choosing:
             choosing = False
             index = 0
             sb.collapseUncertainty(window[event].get_text())  # collapse uncertainty
@@ -102,10 +109,10 @@ if __name__ == '__main__':
                 for j in range(3):
                     window.FindElement(str(i+1)+str(j+1)).Update(text=sb.getTile(i, j))
 
-            window.FindElement('c1').Update(visible=False)
-            window.FindElement('c2').Update(visible=False)
+            window.FindElement('c1').Update(text='')
+            window.FindElement('c2').Update(text='')
 
-        if checkVictory() != "banana":  # this is to show the 'you win' messages
+        if not choosing and checkVictory() != "banana":  # this is to show the 'you win' messages
             game = False
             window.FindElement('v').Update(text=checkVictory())
             window.FindElement('v').Update(visible=True)
@@ -114,8 +121,12 @@ if __name__ == '__main__':
         if not game and event == 'a':  # this is just to reset the game
             game = True
             sb = SB.SmallBoard()
-            for i in range(1, 4):
-                for j in range(1, 4):
-                    window.FindElement(str(i) + str(j)).Update(text=' ')
-            window.FindElement('v').Update(visible=False)  # hide victory message
-            window.FindElement('a').Update(visible=False)
+            index = 0
+            # window.close()
+            window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
+                               size=(400, 510), font='Any 14').Layout(makeLayout())
+            # for i in range(1, 4):
+            #     for j in range(1, 4):
+            #         window.FindElement(str(i) + str(j)).Update(text=' ')
+            # window.FindElement('v').Update(visible=False)  # hide victory message
+            # window.FindElement('a').Update(visible=False)

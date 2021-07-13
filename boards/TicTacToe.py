@@ -78,6 +78,9 @@ class SmallBoard:
 
     def hasCycle(self, line, col):  # checks if there is a cycle starting in this tile
 
+        if self.sameSymbol(line, col):
+            return False
+
         self.cycle = []
         self.initialTile = [line, col]  # to know where you pass through
         tile = self.tiles[line][col]
@@ -86,6 +89,17 @@ class SmallBoard:
 
         nextTile = self.findIndex(tile[1], [line, col])
         if self.recursiveHasCycle(nextTile[0], nextTile[1], tile[1]):
+            return True
+        return False
+
+    def sameSymbol(self, line, col):
+        tile = self.tiles[line][col]
+
+        if len(tile) <= 3:
+            return False
+
+        if tile[0]+tile[1] == tile[3]+tile[4]:
+            self.tiles[line][col] = tile[0]
             return True
         return False
 

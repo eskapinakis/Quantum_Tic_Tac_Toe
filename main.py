@@ -80,6 +80,10 @@ if __name__ == '__main__':
             index += 0.5
 
             if index % 2 == 0 or index % 2 == 1:  # checks if there is a cycle
+
+                if sb.sameSymbol(int(event[0]) - 1, int(event[1]) - 1):
+                    window[event].update(text=window[event].get_text()[0])
+
                 if sb.hasCycle(int(event[0]) - 1, int(event[1]) - 1):
                     choosing = True
                     message = sb.getMessage()

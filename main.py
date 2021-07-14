@@ -103,7 +103,7 @@ if __name__ == '__main__':
 
         if event in ['c1', 'c2'] and choosing:
             choosing = False
-            index = 0
+            # index = 0
             sb.collapseUncertainty(window[event].get_text())  # collapse uncertainty
             for i in range(3):
                 for j in range(3):
@@ -122,7 +122,7 @@ if __name__ == '__main__':
             game = True
             sb = SB.SmallBoard()
             index = 0
-            # window.close()
+            window.close()
             window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
                                size=(400, 510), font='Any 14').Layout(makeLayout())
             # for i in range(1, 4):

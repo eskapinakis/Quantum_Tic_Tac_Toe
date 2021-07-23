@@ -1,23 +1,41 @@
 class SmallBoard:
 
     tiles = []
+    counters = []  # this keeps tabs on the index of each move
+
+    winingCol = []  # these are the lines/cols that yield a victory
+    winingLine = []
+    line = False  # was the sort of tie given by lines
 
     initialTile = []
     cycle = []
 
     def __init__(self):
         self.tiles = [['' for _ in range(3)] for _ in range(3)]
+        self.counters = [['' for _ in range(3)] for _ in range(3)]
         self.cycle = []
         self.initialTile = []
+        self.winingCol = []
+        self.winingLine = []
+        self.line = False
 
     def isOccupied(self, line, col):
         return self.tiles[line][col] != ''
+
+    def getWinCol(self):
+        return self.winingCol
+
+    def getWinLine(self):
+        return self.winingLine
 
     def getLine(self, i):
         return self.tiles[i]
 
     def getColumn(self, i):
         return [self.tiles[0][i], self.tiles[1][i], self.tiles[2][i]]
+
+    def getCounterColumn(self, i):
+        return [self.counters[0][i], self.counters[1][i], self.counters[2][i]]
 
     def getDiagonal(self, i):
         if i == 0:
@@ -35,12 +53,18 @@ class SmallBoard:
     def lineVictory(self, player):
         for i in range(3):
             if self.allEqual(self.getLine(i), player):
+                if [i, player] not in self.winingLine:
+                    self.winingLine.append([i, player])
+                self.line = True
                 return True
         return False
 
     def colVictory(self, player):
         for i in range(3):
             if self.allEqual(self.getColumn(i), player):
+                if [i, player] not in self.winingCol:
+                    self.winingCol.append([i, player])
+                self.line = False
                 return True
         return False
 
@@ -50,16 +74,74 @@ class SmallBoard:
                 return True
         return False
 
+    @staticmethod
+    def removeOtherPlayer(line, player):
+        if player == 'X':  # to have the other player
+            other = 'O'
+        else:
+            other = 'X'
+        # print('other: ', other)
+        for i in range(len(line)):  # remove the other player from this line
+            tile = line[i]
+            for j in range(len(tile)):
+                if tile[j] == other:
+                    tile = tile.replace(tile[j+1], '0')
+                    tile = tile.replace(other, player)
+            line[i] = tile
+        return line
+
+    @staticmethod
+    def getSmallestBiggest(line1, line2):
+
+        max1 = 0  # get the biggest index in the first line
+        for tile in line1:
+            if int(tile[1]) > max1:
+                max1 = int(tile[1])
+            if int(tile[4]) > max1:
+                max1 = int(tile[4])
+
+        max2 = 0  # get the biggest index in the second line
+        for tile in line2:
+            if int(tile[1]) > max2:
+                max2 = int(tile[1])
+            if int(tile[4]) > max2:
+                max2 = int(tile[4])
+
+        if max1 < max2:  # return the player with the smallest biggest index
+            return line1[0][0]
+        else:
+            return line2[0][0]
+
+    # if both players won
+    def getWinner(self):
+        if self.line:
+            line1 = self.counters[int(self.winingLine[0][0])]
+            line1 = self.removeOtherPlayer(line1, self.winingLine[0][1])
+            line2 = self.counters[int(self.winingLine[1][0])]
+            line2 = self.removeOtherPlayer(line2, self.winingLine[1][1])
+            return self.getSmallestBiggest(line1, line2)
+        else:
+            col1 = self.getCounterColumn(int(self.winingCol[0][0]))
+            col1 = self.removeOtherPlayer(col1, self.winingCol[0][1])
+            col2 = self.getCounterColumn(int(self.winingCol[1][0]))
+            col2 = self.removeOtherPlayer(col2, self.winingCol[1][1])
+            return self.getSmallestBiggest(col1, col2)
+
     def getTile(self, line, col):
         return self.tiles[line][col]
 
     def getBoard(self):
         return self.tiles
 
+    def getCounters(self):
+        return self.counters
+
     def play(self, line, col, player):
         if self.tiles[line][col] == '':
+            self.counters[line][col] = player
             self.tiles[line][col] = player
         else:
+            self.counters[line][col] += ' ' + player
             self.tiles[line][col] += ' ' + player
 
     def findIndex(self, index, current_tile):  # finds the other tile where the index is
@@ -92,6 +174,7 @@ class SmallBoard:
             return True
         return False
 
+    # if both particles are in the same tile we collapse it
     def sameSymbol(self, line, col):
         tile = self.tiles[line][col]
 

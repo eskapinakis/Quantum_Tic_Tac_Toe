@@ -27,12 +27,24 @@ def printBoard(board):
 
 
 def checkVictory():
+
+    oVictory = False
+    xVictory = False
+
     if sb.checkVictory('O'):
-        return "Player 2 has won"
+        oVictory = True
     if sb.checkVictory('X'):
-        return "Player 1 has won"
-    if sb.isFull():
+        xVictory = True
+
+    if oVictory and xVictory:
+        return sb.getWinner() + " has Won"
+    elif oVictory:
+        return "O has won"
+    elif xVictory:
+        return "X has won"
+    elif sb.isFull():
         return "It's a Tie"
+
     return "banana"
 
 
@@ -62,6 +74,9 @@ if __name__ == '__main__':
     while True:
 
         # printBoard(sb.getBoard())
+        # printBoard(sb.getCounters())
+        # print('col: ', sb.getWinCol())
+        # print('line: ', sb.getWinLine())
 
         if index % 2 == 0:  # so each player plays twice
             player = 'X'

@@ -3,19 +3,33 @@ import PySimpleGUI as sg
 
 
 def makeLayout():
-    return [[sg.Button('', key='11', auto_size_button=False, size=(6, 4)),
-            sg.Button('', key='12', auto_size_button=False, size=(6, 4)),
-            sg.Button('', key='13', auto_size_button=False, size=(6, 4))],
-            [sg.Button('', key='21', auto_size_button=False, size=(6, 4)),
-            sg.Button('', key='22', auto_size_button=False, size=(6, 4)),
-            sg.Button('', key='23', auto_size_button=False, size=(6, 4))],
-            [sg.Button('', key='31', auto_size_button=False, size=(6, 4)),
-            sg.Button('', key='32', auto_size_button=False, size=(6, 4)),
-            sg.Button('', key='33', auto_size_button=False, size=(6, 4))],
-            [sg.Button('', key='v', visible=False), sg.Button('Play again', key='a', visible=False)],
-            [sg.Button('', key='c1', auto_size_button=False, size=(3, 2)),
-            sg.Button('', key='c2', auto_size_button=False, size=(3, 2))]
-            ]
+
+    if quantum:
+        return [[sg.Button('', key='11', auto_size_button=False, size=(6, 4)),
+                sg.Button('', key='12', auto_size_button=False, size=(6, 4)),
+                sg.Button('', key='13', auto_size_button=False, size=(6, 4))],
+                [sg.Button('', key='21', auto_size_button=False, size=(6, 4)),
+                sg.Button('', key='22', auto_size_button=False, size=(6, 4)),
+                sg.Button('', key='23', auto_size_button=False, size=(6, 4))],
+                [sg.Button('', key='31', auto_size_button=False, size=(6, 4)),
+                sg.Button('', key='32', auto_size_button=False, size=(6, 4)),
+                sg.Button('', key='33', auto_size_button=False, size=(6, 4))],
+                [sg.Button('', key='v', visible=False), sg.Button('Play again', key='a', visible=False)],
+                [sg.Button('', key='c1', auto_size_button=False, size=(3, 2)),
+                sg.Button('', key='c2', auto_size_button=False, size=(3, 2))]
+                ]
+    else:
+        return [[sg.Button('', key='11', auto_size_button=False, size=(6, 4)),
+                 sg.Button('', key='12', auto_size_button=False, size=(6, 4)),
+                 sg.Button('', key='13', auto_size_button=False, size=(6, 4))],
+                [sg.Button('', key='21', auto_size_button=False, size=(6, 4)),
+                 sg.Button('', key='22', auto_size_button=False, size=(6, 4)),
+                 sg.Button('', key='23', auto_size_button=False, size=(6, 4))],
+                [sg.Button('', key='31', auto_size_button=False, size=(6, 4)),
+                 sg.Button('', key='32', auto_size_button=False, size=(6, 4)),
+                 sg.Button('', key='33', auto_size_button=False, size=(6, 4))],
+                [sg.Button('', key='v', visible=False), sg.Button('Play again', key='a', visible=False)]
+                ]
 
 
 sb = SB.SmallBoard()
@@ -44,7 +58,6 @@ def checkVictory():
         return "X has won"
     elif sb.isFull():
         return "It's a Tie"
-
     return "banana"
 
 
@@ -64,12 +77,15 @@ def play(piece):
 
 if __name__ == '__main__':
 
-    window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
-                       size=(400, 510), font='Any 14').Layout(makeLayout())
     player = 'O'
     game = True
     choosing = False
     index = 0
+
+    quantum = False  # make it true or false if tic tac toe is supposed to be quantum or not
+
+    window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
+                       size=(400, 510), font='Any 14').Layout(makeLayout())
 
     while True:
 
@@ -88,60 +104,86 @@ if __name__ == '__main__':
         if event in ('Exit', None):  # if player wants to exit
             break
 
-        # when the player chooses a tile
-        if game and not choosing and event not in ['a', 'v', 'c1', 'c2'] and \
-                len(window[event].get_text()) <= 3 and checkVictory() == "banana" and\
-                len(window[event].get_text()) != 1:
+        if quantum:
 
-            line = int(event[0]) - 1
-            col = int(event[1]) - 1
+            # when the player chooses a tile
+            if game and not choosing and event not in ['a', 'v', 'c1', 'c2'] and \
+                    len(window[event].get_text()) <= 3 and checkVictory() == "banana" and\
+                    len(window[event].get_text()) != 1:
 
-            sb.play(line, col, player + str(int(index)))
-            if window[event].get_text() == ' ':
-                window[event].update(text=player + str(int(index)))
-            else:
-                window[event].update(text=window[event].get_text() + ' ' + player + str(int(index)))
-            index += 0.5
+                line = int(event[0]) - 1
+                col = int(event[1]) - 1
 
-            if index % 2 == 0 or index % 2 == 1:  # checks if there is a cycle
+                sb.play(line, col, player + str(int(index)))
+                if window[event].get_text() == '':
+                    window[event].update(text=player + str(int(index)))
+                else:
+                    window[event].update(text=window[event].get_text() + ' ' + player + str(int(index)))
+                index += 0.5
 
-                if sb.sameSymbol(line, col):
-                    window[event].update(text=sb.getTile(line, col))
+                if index % 2 == 0 or index % 2 == 1:  # checks if there is a cycle
 
-                if sb.hasCycle(line, col):
-                    choosing = True
-                    message = sb.getMessage()
-                    window.FindElement('c1').Update(text=message[0])
-                    window.FindElement('c2').Update(text=message[1])
-                    # print(sb.getCycle())
+                    if sb.sameSymbol(line, col):
+                        window[event].update(text=sb.getTile(line, col))
+
+                    if sb.hasCycle(line, col):
+                        choosing = True
+                        message = sb.getMessage()
+                        window.FindElement('c1').Update(text=message[0])
+                        window.FindElement('c2').Update(text=message[1])
+                        # print(sb.getCycle())
+                window.Refresh()
+
+            if event in ['c1', 'c2'] and choosing:
+                choosing = False
+                # index = 0
+                sb.collapseUncertainty(window[event].get_text())  # collapse uncertainty
+                for i in range(3):
+                    for j in range(3):
+                        window.FindElement(str(i+1)+str(j+1)).Update(text=sb.getTile(i, j))
+
+                window.FindElement('c1').Update(text='')
+                window.FindElement('c2').Update(text='')
+
+            if not choosing and checkVictory() != "banana":  # this is to show the 'you win' messages
+                game = False
+                window.FindElement('v').Update(text=checkVictory())
+                window.FindElement('v').Update(visible=True)
+                window.FindElement('a').Update(visible=True)
+
+            if not game and event == 'a':  # this is just to reset the game
+                game = True
+                sb = SB.SmallBoard()
+                index = 0
+                window.close()
+                window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
+                                   size=(400, 510), font='Any 14').Layout(makeLayout())
+
+        else:
+            # when the player chooses a tile
+            if game and event not in ['a', 'v', 'c1', 'c2'] and \
+                    len(window[event].get_text()) <= 3 and checkVictory() == "banana" and \
+                    len(window[event].get_text()) != 1:
+
+                line = int(event[0]) - 1
+                col = int(event[1]) - 1
+
+                sb.play(line, col, player)
+                if window[event].get_text() == '':
+                    window[event].update(text=player)
+                index += 1
             window.Refresh()
 
-        if event in ['c1', 'c2'] and choosing:
-            choosing = False
-            # index = 0
-            sb.collapseUncertainty(window[event].get_text())  # collapse uncertainty
-            for i in range(3):
-                for j in range(3):
-                    window.FindElement(str(i+1)+str(j+1)).Update(text=sb.getTile(i, j))
+            if checkVictory() != "banana":  # this is to show the 'you win' messages
+                game = False
+                window.FindElement('v').Update(text=checkVictory())
+                window.FindElement('v').Update(visible=True)
+                window.FindElement('a').Update(visible=True)
 
-            window.FindElement('c1').Update(text='')
-            window.FindElement('c2').Update(text='')
-
-        if not choosing and checkVictory() != "banana":  # this is to show the 'you win' messages
-            game = False
-            window.FindElement('v').Update(text=checkVictory())
-            window.FindElement('v').Update(visible=True)
-            window.FindElement('a').Update(visible=True)
-
-        if not game and event == 'a':  # this is just to reset the game
-            game = True
-            sb = SB.SmallBoard()
-            index = 0
-            window.close()
-            window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
-                               size=(400, 510), font='Any 14').Layout(makeLayout())
-            # for i in range(1, 4):
-            #     for j in range(1, 4):
-            #         window.FindElement(str(i) + str(j)).Update(text=' ')
-            # window.FindElement('v').Update(visible=False)  # hide victory message
-            # window.FindElement('a').Update(visible=False)
+            if not game and event == 'a':  # this is just to reset the game
+                game = True
+                sb = SB.SmallBoard()
+                index = 0
+                window.close()
+                window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
+                                   size=(400, 510), font='Any 14').Layout(makeLayout())

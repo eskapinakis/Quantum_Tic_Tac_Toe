@@ -19,6 +19,9 @@ class SmallBoard:
         self.winingLine = []
         self.line = False
 
+    def copyTiles(self, tiles):
+        self.tiles = tiles
+
     def isOccupied(self, line, col):
         return self.tiles[line][col] != ''
 

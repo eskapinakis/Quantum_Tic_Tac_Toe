@@ -32,8 +32,10 @@ class SimpleAlgorithm:
     def getMove(self):
 
         if self.moveToWin():
+            # print('win')
             return self.move
-        elif self.moveToBlock():
+        if self.moveToBlock():
+            # print('block')
             return self.move
         else:
             return self.randomMove()

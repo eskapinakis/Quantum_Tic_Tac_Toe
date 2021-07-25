@@ -1,4 +1,5 @@
 # Just checks if there is a move to win or block and, if not chooses an odd tile
+import random
 
 
 class SimpleAlgorithm:
@@ -21,6 +22,10 @@ class SimpleAlgorithm:
 
     def assignBoard(self, board):
         self.board = board
+
+    def printBoard(self):
+        for l in self.board.getBoard():
+            print(l)
 
     @staticmethod
     def getCoordinates(index):
@@ -76,8 +81,11 @@ class SimpleAlgorithm:
 
         board = self.board
 
-        if not board.isOccupied(1, 1):  # Return middle piece
+        if not board.isOccupied(1, 1):  # if the middle tile is free
             return [1, 1]
+
+        options = []
+        goodOptions = []
 
         for i in range(9):
             line = self.getCoordinates(i)[0]
@@ -85,9 +93,24 @@ class SimpleAlgorithm:
             if not board.isOccupied(line, col):  # if the tile is free
                 board.play(line, col, self.piece)
                 if not self.enablesTwoOptions(board, self.other):  # if it's not a bad move
-                    board.eraseMove(line, col)
-                    return [line, col]
+                    options.append([line, col])
                 board.eraseMove(line, col)
+
+        for coord in options:
+            line = coord[0]
+            col = coord[1]
+            board.play(line, col, self.piece)
+            if self.enablesTwoOptions(board, self.piece):  # if it's a good move
+                goodOptions.append([line, col])
+            board.eraseMove(line, col)
+
+        if len(goodOptions) > 0:
+            return random.choice(goodOptions)
+
+        return random.choice(options)
+
+
+
 
     def enablesTwoOptions(self, board, piece):  # to see if a move will enable two options
 
@@ -100,8 +123,8 @@ class SimpleAlgorithm:
             for j in range(3):
                 if not board.isOccupied(i, j):
                     board.play(i, j, piece)
-                    if self.twoWinningOptions(board, piece) and not \
-                            self.isThereWinningMove(board, other):
+                    if self.twoWinningOptions(board, piece) and \
+                            not self.isThereWinningMove(board, other):
                         board.eraseMove(i, j)
                         return True
                     board.eraseMove(i, j)

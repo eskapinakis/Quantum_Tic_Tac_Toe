@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
     while True:
 
-        printBoard(sb.getBoard())
+        # printBoard(sb.getBoard())
         # printBoard(sb.getCounters())
         # print('col: ', sb.getWinCol())
         # print('line: ', sb.getWinLine())

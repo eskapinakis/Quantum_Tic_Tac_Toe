@@ -1,5 +1,6 @@
 from boards import TicTacToe as SB
 import PySimpleGUI as sg
+from ai import SimpleAlgorithm as SA
 
 
 def makeLayout():
@@ -83,6 +84,7 @@ if __name__ == '__main__':
     index = 0
 
     quantum = False  # make it true or false if tic tac toe is supposed to be quantum or not
+    computer = True  # make it true or false to play against computer or not
 
     window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
                        size=(400, 510), font='Any 14').Layout(makeLayout())
@@ -93,18 +95,22 @@ if __name__ == '__main__':
         # printBoard(sb.getCounters())
         # print('col: ', sb.getWinCol())
         # print('line: ', sb.getWinLine())
+        # print(index)
 
-        if index % 2 == 0:  # so each player plays twice
+        if not computer:  # only ask for user input when a player will play
+            event, values = window.Read()
+        elif index % 2 == 0:  # the first player is the user
+            event, values = window.Read()
+
+        if index % 2 == 0:  # assign each piece to each player
             player = 'X'
         if index % 2 == 1:
             player = 'O'
 
-        event, values = window.Read()
-
         if event in ('Exit', None):  # if player wants to exit
             break
 
-        if quantum:
+        if quantum:  # To play Quantum Tic Tac Toe
 
             # when the player chooses a tile
             if game and not choosing and event not in ['a', 'v', 'c1', 'c2'] and \
@@ -131,12 +137,9 @@ if __name__ == '__main__':
                         message = sb.getMessage()
                         window.FindElement('c1').Update(text=message[0])
                         window.FindElement('c2').Update(text=message[1])
-                        # print(sb.getCycle())
-                window.Refresh()
 
             if event in ['c1', 'c2'] and choosing:
                 choosing = False
-                # index = 0
                 sb.collapseUncertainty(window[event].get_text())  # collapse uncertainty
                 for i in range(3):
                     for j in range(3):
@@ -150,40 +153,54 @@ if __name__ == '__main__':
                 window.FindElement('v').Update(text=checkVictory())
                 window.FindElement('v').Update(visible=True)
                 window.FindElement('a').Update(visible=True)
+                index = 0
 
             if not game and event == 'a':  # this is just to reset the game
                 game = True
                 sb = SB.SmallBoard()
-                index = 0
                 window.close()
                 window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
                                    size=(400, 510), font='Any 14').Layout(makeLayout())
 
-        else:
+        if not quantum:  # Regular Tic Tac Toe
+
             # when the player chooses a tile
-            if game and event not in ['a', 'v', 'c1', 'c2'] and \
-                    len(window[event].get_text()) <= 3 and checkVictory() == "banana" and \
-                    len(window[event].get_text()) != 1:
+            if (index % 2 == 0 and computer) or not computer:
+                if game and event not in ['a', 'v', 'c1', 'c2'] and \
+                        len(window[event].get_text()) <= 3 and checkVictory() == "banana" and \
+                        len(window[event].get_text()) != 1:
 
-                line = int(event[0]) - 1
-                col = int(event[1]) - 1
+                    line = int(event[0]) - 1
+                    col = int(event[1]) - 1
 
+                    sb.play(line, col, player)
+                    if window[event].get_text() == '':
+                        window[event].update(text=player)
+                    index += 1
+
+            # if second player is the computer
+            elif computer and index % 2 == 1 and checkVictory() == "banana":
+                sa = SA.SimpleAlgorithm(sb)
+                coord = sa.getMove()
+                line = coord[0]
+                col = coord[1]
                 sb.play(line, col, player)
-                if window[event].get_text() == '':
-                    window[event].update(text=player)
+                window.FindElement(str(line+1)+str(col+1)).update(text=player)
                 index += 1
-            window.Refresh()
 
             if checkVictory() != "banana":  # this is to show the 'you win' messages
                 game = False
                 window.FindElement('v').Update(text=checkVictory())
                 window.FindElement('v').Update(visible=True)
                 window.FindElement('a').Update(visible=True)
+                index = 0
 
             if not game and event == 'a':  # this is just to reset the game
                 game = True
                 sb = SB.SmallBoard()
-                index = 0
                 window.close()
                 window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
                                    size=(400, 510), font='Any 14').Layout(makeLayout())
+
+        window.Refresh()
+

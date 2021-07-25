@@ -147,6 +147,9 @@ class SmallBoard:
             self.counters[line][col] += ' ' + player
             self.tiles[line][col] += ' ' + player
 
+    def eraseMove(self, line, col):
+        self.tiles[line][col] = ''
+
     def findIndex(self, index, current_tile):  # finds the other tile where the index is
         for i in range(3):
             for j in range(3):

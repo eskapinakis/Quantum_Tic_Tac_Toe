@@ -11,6 +11,9 @@ class Node:
         self.father = node
         self.board = SB.SmallBoard()
 
+    def getBoard(self):
+        return self.board
+
     def addChildren(self, node):
         self.children.append(node)
 
@@ -22,3 +25,11 @@ class Node:
 
     def isWinning(self, player):
         return self.board.checkVictory(player)
+
+    def copyBoard(self):
+        self.board.copyTiles(self.getFather().getBoard().getBoard())
+
+    def play(self, coord, player):
+        line = coord[0]
+        col = coord[1]
+        self.board.play(line, col, player)

@@ -6,10 +6,17 @@ class Tree:
 
     root = None
     board = None
+    player = 'X'
 
     def __init__(self):
         self.root = Node.Node()
         self.makeChildren(self.root)
+
+    def changePLayer(self):
+        if self.player == 'X':
+            self.player = 'O'
+        else:
+            self.player = 'X'
 
     @staticmethod
     def getCoordinates(i):
@@ -17,11 +24,17 @@ class Tree:
         col = i % 3
         return [line, col]
 
-    @staticmethod
-    def makeChildren(node):
+    def makeChildren(self, node):
 
         for i in range(9):
-            return 0
+
+            child = Node.Node(node)
+            child.copyBoard()
+            child.play(self.getCoordinates(i), self.player)
+            self.ChangePlayer()
+            node.addChildren(child)
+            if not node.isWinning():
+                self.makeChildren(child)
 
 
 

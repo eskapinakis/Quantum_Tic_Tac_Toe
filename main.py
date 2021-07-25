@@ -76,7 +76,8 @@ if __name__ == '__main__':
     window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
                        size=(400, 510), font='Any 14').Layout(makeLayout())
 
-    window.read()
+    if computerFirst:
+        window.Finalize()
 
     while True:
 
@@ -201,6 +202,6 @@ if __name__ == '__main__':
                 window.close()
                 window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
                                    size=(400, 510), font='Any 14').Layout(makeLayout())
-                window.read()
+                window.Finalize()
 
         window.Refresh()

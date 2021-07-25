@@ -97,6 +97,8 @@ if __name__ == '__main__':
         # print('line: ', sb.getWinLine())
         # print(index)
 
+        event = "Banana"
+
         if not computer:  # only ask for user input when a player will play
             event, values = window.Read()
         elif index % 2 == 0:  # the first player is the user
@@ -203,4 +205,3 @@ if __name__ == '__main__':
                                    size=(400, 510), font='Any 14').Layout(makeLayout())
 
         window.Refresh()
-

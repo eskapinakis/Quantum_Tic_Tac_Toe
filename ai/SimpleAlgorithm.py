@@ -9,7 +9,7 @@ class SimpleAlgorithm:
     move = None
 
     def __init__(self, board, piece='O'):
-        # self.move = []
+        self.move = []
 
         self.assignBoard(board)
 
@@ -24,6 +24,7 @@ class SimpleAlgorithm:
 
     @staticmethod
     def getCoordinates(index):
+
         line = int(index / 3)
         col = int(index % 3)
         return [line, col]
@@ -31,13 +32,10 @@ class SimpleAlgorithm:
     def getMove(self):
 
         if self.moveToWin():
-            # print('win')
             return self.move
         elif self.moveToBlock():
-            # print('block')
             return self.move
         else:
-            # print('random')
             return self.randomMove()
 
     def moveToWin(self):
@@ -53,6 +51,7 @@ class SimpleAlgorithm:
                         return True
                     else:
                         board.eraseMove(i, j)
+
         return False
 
     def moveToBlock(self):
@@ -68,6 +67,7 @@ class SimpleAlgorithm:
                         return True
                     else:
                         board.eraseMove(i, j)
+
         return False
 
     def randomMove(self):
@@ -80,11 +80,11 @@ class SimpleAlgorithm:
         for i in range(9):
             line = self.getCoordinates(i)[0]
             col = self.getCoordinates(i)[1]
-            if not board.isOccupied(line, col):  # if free place
+            if not board.isOccupied(line, col):  # if the tile is free
                 board.play(line, col, self.piece)
-                if not self.enablesTwoOptions(board, self.other):
+                if not self.enablesTwoOptions(board, self.other):  # if it's not a bad move
                     board.eraseMove(line, col)
-                    return [line, col]  # Return a corner piece
+                    return [line, col]
                 board.eraseMove(line, col)
 
     def enablesTwoOptions(self, board, piece):  # to see if a move will enable two options
@@ -103,10 +103,12 @@ class SimpleAlgorithm:
                         board.eraseMove(i, j)
                         return True
                     board.eraseMove(i, j)
+
         return False
 
     @staticmethod
     def twoWinningOptions(board, piece):  # to see if there are two winning moves for a player
+
         winningMoves = 0
 
         for i in range(3):  # counts the number of winning moves
@@ -124,6 +126,7 @@ class SimpleAlgorithm:
 
     @staticmethod
     def isThereWinningMove(board, piece):
+
         for i in range(3):
             for j in range(3):
                 if not board.isOccupied(i, j):
@@ -132,4 +135,5 @@ class SimpleAlgorithm:
                         board.eraseMove(i, j)
                         return True
                     board.eraseMove(i, j)
+
         return False

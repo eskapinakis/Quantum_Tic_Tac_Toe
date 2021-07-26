@@ -84,8 +84,27 @@ class SimpleAlgorithm:
         if not board.isOccupied(1, 1):  # if the middle tile is free
             return [1, 1]
 
+        options = self.blockTheFuture(board)
+
+        return self.cornersFirst(options)
+
+    @staticmethod
+    def cornersFirst(options):
+
+        corners = []
+
+        for coord in options:
+            if coord in [[0, 0], [0, 2], [2, 0], [2, 2]]:
+                corners.append(coord)
+
+        if len(corners) > 0:
+            return random.choice(corners)
+        return random.choice(options)
+
+    # Choose the options that will not lead to death by stupid
+    def blockTheFuture(self, board):
+
         options = []
-        goodOptions = []
 
         for i in range(9):
             line = self.getCoordinates(i)[0]
@@ -96,21 +115,7 @@ class SimpleAlgorithm:
                     options.append([line, col])
                 board.eraseMove(line, col)
 
-        for coord in options:
-            line = coord[0]
-            col = coord[1]
-            board.play(line, col, self.piece)
-            if self.enablesTwoOptions(board, self.piece):  # if it's a good move
-                goodOptions.append([line, col])
-            board.eraseMove(line, col)
-
-        if len(goodOptions) > 0:
-            return random.choice(goodOptions)
-
-        return random.choice(options)
-
-
-
+        return options
 
     def enablesTwoOptions(self, board, piece):  # to see if a move will enable two options
 

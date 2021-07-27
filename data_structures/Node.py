@@ -27,10 +27,16 @@ class Node:
     def getFather(self):
         return self.father
 
+    def getMove(self):
+        return self.move
+
     def isWinning(self, player):
         return self.board.checkVictory(player)
 
-    def copyBoard(self):
+    def copyBoard(self, tiles):
+        self.board.copyTiles(tiles)
+
+    def copyFather(self):
         self.board.copyTiles(self.getFather().getBoard().getBoard())
 
     def play(self, coord, player):

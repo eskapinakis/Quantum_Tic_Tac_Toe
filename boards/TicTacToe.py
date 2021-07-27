@@ -20,7 +20,9 @@ class SmallBoard:
         self.line = False
 
     def copyTiles(self, tiles):
-        self.tiles = tiles
+        for i in range(3):
+            for j in range(3):
+                self.tiles[i][j] = tiles[i][j]
 
     def isOccupied(self, line, col):
         return self.tiles[line][col] != ''

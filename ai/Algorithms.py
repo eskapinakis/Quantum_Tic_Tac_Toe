@@ -19,8 +19,10 @@ class Algorithms:
     def assignBoard(self, board):
         self.board = board
 
-    def printBoard(self):
-        for l in self.board.getBoard():
+    def printBoard(self, board=None):
+        if not board:
+            board = self.board
+        for l in board.getBoard():
             print(l)
 
     @staticmethod

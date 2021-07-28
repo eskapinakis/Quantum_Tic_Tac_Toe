@@ -19,20 +19,20 @@ class Minimax(Alg.Algorithms):
 
     def getMove(self):
         best = - inf
-        i = 0
+        # i = 0
 
         # Make the first generation
         self.generateChildren(self.root, self.piece)
         bestChild = self.root.getChildren()[0]
 
-        print('')
+        # print('')
         for child in self.root.getChildren():  # It's now the other guy's move
             # print('')
             # print('best eval: ', best)
-            eval = self.minimax(child, 2, False)  # eval = self.evalTerminal(child)
+            eval = self.minimax(child, 5, False)  # eval = self.evalTerminal(child)
 
-            print('eval ', i, ': ', eval, ' move: ', child.getMove())
-            i += 1
+            # print('eval ', i, ': ', eval, ' move: ', child.getMove())
+            # i += 1
             if eval > best:
                 bestChild = child
                 best = eval
@@ -44,6 +44,7 @@ class Minimax(Alg.Algorithms):
         return bestChild.getMove()
 
     def evalTerminal(self, node):
+
         # Immediate
         if node.isWinning(self.other):
             return -10

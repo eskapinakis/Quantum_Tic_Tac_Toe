@@ -18,57 +18,61 @@ class Minimax(Alg.Algorithms):
         # self.printBoard(self.root.getBoard())
 
     def getMove(self):
-        print('')
-        best = 0
+        best = - inf
         i = 0
 
+        # Make the first generation
         self.generateChildren(self.root, self.piece)
         bestChild = self.root.getChildren()[0]
 
-        for child in self.root.getChildren():
-            # eval = self.minimax(child, 4, self.piece)
-            eval = self.evalTerminal(child)
-            print('eval ', i, ' : ', eval, ' move: ', child.getMove())
+        print('')
+        for child in self.root.getChildren():  # It's now the other guy's move
+            # print('')
+            # print('best eval: ', best)
+            eval = self.minimax(child, 2, False)  # eval = self.evalTerminal(child)
+
+            print('eval ', i, ': ', eval, ' move: ', child.getMove())
             i += 1
             if eval > best:
                 bestChild = child
                 best = eval
 
-        # print('final move:', move)
+        # print('final move:', bestChild.getMove(), ' eval: ', eval)
         # print('Child Board')
         # self.printBoard(bestChild.getBoard())
 
         return bestChild.getMove()
 
     def evalTerminal(self, node):
-
         # Immediate
         if node.isWinning(self.other):
             return -10
-        if node.isWinning(self.piece):
+        elif node.isWinning(self.piece):
             return 10
 
+        '''
         # In next move
-        if self.isThereWinningMove(node.getBoard(), self.other):
+        elif self.isThereWinningMove(node.getBoard(), self.other):
             return -7
-        if self.isThereWinningMove(node.getBoard(), self.piece):
+        elif self.isThereWinningMove(node.getBoard(), self.piece):
             return 7
 
         # In two next moves
-        if self.enablesTwoOptions(node.getBoard(), self.other):
+        elif self.enablesTwoOptions(node.getBoard(), self.other):
             return -5
-        if self.enablesTwoOptions(node.getBoard(), self.piece):
+        elif self.enablesTwoOptions(node.getBoard(), self.piece):
             return 5
 
         # Some Heuristics
-        if node.getBoard().getTile(1, 1) == self.other:
+        elif node.getBoard().getTile(1, 1) == self.other:
             return -2
-        if node.getBoard().getTile(1, 1) == self.piece:
+        elif node.getBoard().getTile(1, 1) == self.piece:
             return 2
-
+        
         # Nhe
         else:
-            return 0
+        '''
+        return 0
 
     def generateChildren(self, node, player):
 
@@ -82,14 +86,13 @@ class Minimax(Alg.Algorithms):
             board.copyTiles(node.getBoard().getBoard())
 
             # self.printBoard(board)
+            # print('Child Boards')
 
             if not board.isOccupied(line, col):
                 board.play(line, col, player)
                 # creates a child of node - [line, col] is the move that originated the node
                 child = Node.Node(node, board, [line, col])
                 node.addChildren(child)
-                # self.printBoard(child.getBoard())
-                # print('child move: ', child.getMove())
 
     def minimax(self, node, depth, maximizing):
 
@@ -98,17 +101,21 @@ class Minimax(Alg.Algorithms):
             return self.evalTerminal(node)
 
         if maximizing:
-            self.generateChildren(node, self.piece)
+
+            self.generateChildren(node, self.piece)  # it's my turn
             maxEval = -inf
             for child in node.children:
                 eval = self.minimax(child, depth - 1, False)
+                # print('maxi eval: ', eval, ' move: ', child.getMove())
                 maxEval = max(maxEval, eval)
             return maxEval
 
         else:
-            self.generateChildren(node, self.other)
+
+            self.generateChildren(node, self.other)  # it's your turn
             minEval = inf
             for child in node.children:
                 eval = self.minimax(child, depth - 1, True)
+                # print('mini eval: ', eval, ' move: ', child.getMove())
                 minEval = min(minEval, eval)
             return minEval

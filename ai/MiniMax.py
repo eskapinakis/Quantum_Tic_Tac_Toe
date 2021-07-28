@@ -54,9 +54,9 @@ class Minimax(Alg.Algorithms):
         '''
         # In next move
         elif self.isThereWinningMove(node.getBoard(), self.other):
-            return -7
+            return -10
         elif self.isThereWinningMove(node.getBoard(), self.piece):
-            return 7
+            return 10
 
         # In two next moves
         elif self.enablesTwoOptions(node.getBoard(), self.other):
@@ -71,7 +71,6 @@ class Minimax(Alg.Algorithms):
             return 2
         
         # Nhe
-        else:
         '''
         return 0
 

@@ -6,8 +6,7 @@ class Algorithms:
     move = None
 
     def __init__(self, board, piece='O'):
-        self.move = []
-
+        self.board = None
         self.assignBoard(board)
 
         self.piece = piece
@@ -15,6 +14,8 @@ class Algorithms:
             self.other = 'O'
         else:
             self.other = 'X'
+
+        self.move = []
 
     def assignBoard(self, board):
         self.board = board

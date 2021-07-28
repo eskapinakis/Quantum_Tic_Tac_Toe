@@ -13,11 +13,13 @@ class SmallBoard:
     def __init__(self):
         self.tiles = [['' for _ in range(3)] for _ in range(3)]
         self.counters = [['' for _ in range(3)] for _ in range(3)]
-        self.cycle = []
-        self.initialTile = []
+
         self.winingCol = []
         self.winingLine = []
         self.line = False
+
+        self.initialTile = []
+        self.cycle = []
 
     def copyTiles(self, tiles):
         for i in range(3):

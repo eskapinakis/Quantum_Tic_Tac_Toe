@@ -1,7 +1,8 @@
 from boards import TicTacToe as SB
 import PySimpleGUI as sg
-from ai import SimpleAlgorithm as SA
-# from ai import MiniMax as SA
+
+# from ai import SimpleAlgorithm as SA  # To use the simple algorithm
+from ai import MiniMax as SA  # To use the minimax algorithm
 
 
 def makeLayout():
@@ -82,6 +83,7 @@ if __name__ == '__main__':
 
     while True:
 
+        # print('Main Board')
         # printBoard(sb.getBoard())
         # printBoard(sb.getCounters())
         # print('col: ', sb.getWinCol())
@@ -182,8 +184,8 @@ if __name__ == '__main__':
             # if second player is the computer
             elif computer and game and index % 2 == 1 - remainder and \
                     checkVictory() == "banana":
-                sa = SA.SimpleAlgorithm(sb, player)  # initialize the simple opponent
-                # sa = SA.Minimax(sb, player)
+                # sa = SA.SimpleAlgorithm(sb, player)  # initialize the simple opponent
+                sa = SA.Minimax(sb, player)  # initialize the minimax opponent
                 coord = sa.getMove()
                 line = coord[0]
                 col = coord[1]

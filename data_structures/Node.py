@@ -9,6 +9,7 @@ class Node:
     children = []
 
     def __init__(self, node=None, board=None, move=None):
+        self.children = []
         self.father = node
         self.board = SB.SmallBoard()
         if board:
@@ -20,6 +21,9 @@ class Node:
 
     def addChildren(self, node):
         self.children.append(node)
+
+    def deleteChildren(self):
+        self.children = []
 
     def getChildren(self):
         return self.children

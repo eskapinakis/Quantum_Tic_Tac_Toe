@@ -10,44 +10,61 @@ class Minimax(Alg.Algorithms):
 
     def __init__(self, board, player):
         super().__init__(board, player)
+
         self.root = Node.Node()
         self.root.copyBoard(board.getBoard())
 
-        self.printBoard(self.root.getBoard())
+        # print('Root Board')
+        # self.printBoard(self.root.getBoard())
 
     def getMove(self):
+        print('')
         best = 0
-        move = []
-        bestChild = None
+        i = 0
 
         self.generateChildren(self.root, self.piece)
+        bestChild = self.root.getChildren()[0]
 
         for child in self.root.getChildren():
-            # print('child move: ', child.getMove())
-            eval = self.minimax(child, 0, self.piece)
-            # eval = self.evalTerminal(child)
-            if eval >= best:
+            # eval = self.minimax(child, 4, self.piece)
+            eval = self.evalTerminal(child)
+            print('eval ', i, ' : ', eval, ' move: ', child.getMove())
+            i += 1
+            if eval > best:
                 bestChild = child
                 best = eval
-                move = child.getMove()
 
         # print('final move:', move)
-        self.printBoard(bestChild.getBoard())
-        return move
+        # print('Child Board')
+        # self.printBoard(bestChild.getBoard())
+
+        return bestChild.getMove()
 
     def evalTerminal(self, node):
 
-        # Good fo me
+        # Immediate
+        if node.isWinning(self.other):
+            return -10
         if node.isWinning(self.piece):
             return 10
+
+        # In next move
+        if self.isThereWinningMove(node.getBoard(), self.other):
+            return -7
+        if self.isThereWinningMove(node.getBoard(), self.piece):
+            return 7
+
+        # In two next moves
+        if self.enablesTwoOptions(node.getBoard(), self.other):
+            return -5
         if self.enablesTwoOptions(node.getBoard(), self.piece):
             return 5
 
-        # Good for you
-        if node.isWinning(self.other):
-            return -10
-        if self.enablesTwoOptions(node.getBoard(), self.other):
-            return -6
+        # Some Heuristics
+        if node.getBoard().getTile(1, 1) == self.other:
+            return -2
+        if node.getBoard().getTile(1, 1) == self.piece:
+            return 2
 
         # Nhe
         else:
@@ -81,7 +98,7 @@ class Minimax(Alg.Algorithms):
             return self.evalTerminal(node)
 
         if maximizing:
-            self.generateChildren(node, self.other)
+            self.generateChildren(node, self.piece)
             maxEval = -inf
             for child in node.children:
                 eval = self.minimax(child, depth - 1, False)
@@ -89,7 +106,7 @@ class Minimax(Alg.Algorithms):
             return maxEval
 
         else:
-            self.generateChildren(node, self.piece)
+            self.generateChildren(node, self.other)
             minEval = inf
             for child in node.children:
                 eval = self.minimax(child, depth - 1, True)

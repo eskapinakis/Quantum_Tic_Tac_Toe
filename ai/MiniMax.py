@@ -9,43 +9,31 @@ class Minimax(Alg.Algorithms):
     root = None
 
     def __init__(self, board, player):
+
         super().__init__(board, player)
 
         self.root = Node.Node()
         self.root.copyBoard(board.getBoard())
 
-        # print('Root Board')
-        # self.printBoard(self.root.getBoard())
-
     def getMove(self):
+
         best = - inf
-        # i = 0
 
         # Make the first generation
         self.generateChildren(self.root, self.piece)
         bestChild = self.root.getChildren()[0]
 
-        # print('')
-        for child in self.root.getChildren():  # It's now the other guy's move
-            # print('')
-            # print('best eval: ', best)
-            eval = self.minimax(child, 5, False)  # eval = self.evalTerminal(child)
-
-            # print('eval ', i, ': ', eval, ' move: ', child.getMove())
-            # i += 1
+        for child in self.root.getChildren():
+            # eval = self.minimax(child, 5, False)  # It's now the other guy's move
+            eval = self.pruningMinimax(child, 5, -inf, inf, False)
             if eval > best:
                 bestChild = child
                 best = eval
-
-        # print('final move:', bestChild.getMove(), ' eval: ', eval)
-        # print('Child Board')
-        # self.printBoard(bestChild.getBoard())
 
         return bestChild.getMove()
 
     def evalTerminal(self, node):
 
-        # Immediate
         if node.isWinning(self.other):
             return -10
         elif node.isWinning(self.piece):
@@ -76,8 +64,6 @@ class Minimax(Alg.Algorithms):
 
     def generateChildren(self, node, player):
 
-        # self.printBoard(node.getBoard())
-
         for i in range(9):
             line = self.getCoordinates(i)[0]
             col = self.getCoordinates(i)[1]
@@ -90,8 +76,7 @@ class Minimax(Alg.Algorithms):
 
             if not board.isOccupied(line, col):
                 board.play(line, col, player)
-                # creates a child of node - [line, col] is the move that originated the node
-                child = Node.Node(node, board, [line, col])
+                child = Node.Node(node, board, [line, col])  # [line, col] is the child's move
                 node.addChildren(child)
 
     def minimax(self, node, depth, maximizing):
@@ -119,3 +104,34 @@ class Minimax(Alg.Algorithms):
                 # print('mini eval: ', eval, ' move: ', child.getMove())
                 minEval = min(minEval, eval)
             return minEval
+
+    # minima with alpha beta pruning
+    def pruningMinimax(self, node, depth, alpha, beta, maximizing):
+
+        if depth == 0 or node.isWinning(self.piece) or node.isWinning(self.other) or \
+                node.isFull():
+            return self.evalTerminal(node)
+
+        if maximizing:
+
+            self.generateChildren(node, self.piece)  # it's my turn
+            maxEval = -inf
+            for child in node.children:
+                eval = self.pruningMinimax(child, depth - 1, alpha, beta, False)
+                maxEval = max(maxEval, eval)
+                alpha = max(alpha, eval)
+                if beta <= alpha:
+                    break
+            return maxEval
+
+        else:
+
+            self.generateChildren(node, self.other)  # it's your turn
+            minEval = inf
+            for child in node.children:
+                eval = self.pruningMinimax(child, depth - 1, alpha, beta, True)
+                minEval = min(minEval, eval)
+                beta = min(beta, eval)
+                if beta <= alpha:
+                    break
+        return minEval

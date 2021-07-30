@@ -64,7 +64,7 @@ class Minimax(Alg.Algorithms):
 
     def generateChildren(self, node, player):
 
-        for i in self.preference:
+        for i in range(9):
             line = self.getCoordinates(i)[0]
             col = self.getCoordinates(i)[1]
 

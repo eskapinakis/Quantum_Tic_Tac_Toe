@@ -27,7 +27,7 @@ class SmallBoard:
                 self.tiles[i][j] = tiles[i][j]
 
     def isOccupied(self, line, col):
-        return self.tiles[line][col] != ''
+        return len(self.tiles[line][col]) in [1, 5]
 
     def getWinCol(self):
         return self.winingCol
@@ -87,7 +87,7 @@ class SmallBoard:
             other = 'O'
         else:
             other = 'X'
-        # print('other: ', other)
+
         for i in range(len(line)):  # remove the other player from this line
             tile = line[i]
             for j in range(len(tile)):
@@ -121,13 +121,13 @@ class SmallBoard:
 
     # if both players won
     def getWinner(self):
-        if self.line:
+        if self.line:  # if it was a line victory
             line1 = self.counters[int(self.winingLine[0][0])]
             line1 = self.removeOtherPlayer(line1, self.winingLine[0][1])
             line2 = self.counters[int(self.winingLine[1][0])]
             line2 = self.removeOtherPlayer(line2, self.winingLine[1][1])
             return self.getSmallestBiggest(line1, line2)
-        else:
+        else:  # if it was a column victory
             col1 = self.getCounterColumn(int(self.winingCol[0][0]))
             col1 = self.removeOtherPlayer(col1, self.winingCol[0][1])
             col2 = self.getCounterColumn(int(self.winingCol[1][0]))
@@ -169,13 +169,13 @@ class SmallBoard:
         return self.cycle
 
     def hasCycle(self, line, col):  # checks if there is a cycle starting in this tile
-
         if self.sameSymbol(line, col):
             return False
 
         self.cycle = []
         self.initialTile = [line, col]  # to know where you pass through
         tile = self.tiles[line][col]
+
         if len(tile) <= 2 or tile[1] == tile[4]:
             return False
 
@@ -197,19 +197,9 @@ class SmallBoard:
         return False
 
     def isFull(self):
-
-        # if it's a regular draw
-        k = 0
         for i in range(3):
             for j in range(3):
-                if self.tiles[i][j] in ['X', 'O']:
-                    k += 1
-        if k == 9:
-            return True
-
-        for i in range(3):
-            for j in range(3):
-                if len(self.tiles[i][j]) < 5:
+                if not self.isOccupied(i, j):
                     return False
         return True
 

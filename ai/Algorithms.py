@@ -7,7 +7,7 @@ class Algorithms:
     preference = []
 
     def __init__(self, board, piece='O'):
-        
+
         self.board = None
         self.assignBoard(board)
 
@@ -19,14 +19,14 @@ class Algorithms:
 
         self.move = []
 
-        self.preference = [4, 0, 2, 6, 8, 1, 3, 5, 7]  # tiles by preference
+        self.preference = [0, 2, 4, 6, 8, 1, 3, 5, 7]  # tiles by preference
 
     def assignBoard(self, board):
-        
+
         self.board = board
 
     def printBoard(self, board=None):
-        
+
         if not board:
             board = self.board
         for l in board.getBoard():
@@ -107,9 +107,9 @@ class Algorithms:
         return winningMoves
 
     def twoWinningOptions(self, board, piece):
-        
+
         return self.winningOptions(board, piece) >= 2
 
     def isThereWinningMove(self, board, piece):
-        
+
         return self.winningOptions(board, piece) >= 1

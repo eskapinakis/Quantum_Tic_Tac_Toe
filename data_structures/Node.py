@@ -6,15 +6,17 @@ class Node:
     father = None
     board = None
     move = None
+    move2 = None
     children = []
 
-    def __init__(self, node=None, board=None, move=None):
+    def __init__(self, node=None, board=None, move=None, move2=None):
         self.children = []
         self.father = node
         self.board = SB.SmallBoard()
         if board:
             self.board.copyTiles(board.getBoard())
         self.move = move
+        self.move2 = move2
 
     def getBoard(self):
         return self.board
@@ -33,6 +35,9 @@ class Node:
 
     def getMove(self):
         return self.move
+
+    def getMove2(self):
+        return self.move2
 
     def isWinning(self, player):
         return self.board.checkVictory(player)

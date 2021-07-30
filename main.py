@@ -6,20 +6,19 @@ from ai import MiniMax as SA  # To use the minimax algorithm
 
 
 def makeLayout():
-
     if quantum:
         return [[sg.Button('', key='11', auto_size_button=False, size=(6, 4)),
-                sg.Button('', key='12', auto_size_button=False, size=(6, 4)),
-                sg.Button('', key='13', auto_size_button=False, size=(6, 4))],
+                 sg.Button('', key='12', auto_size_button=False, size=(6, 4)),
+                 sg.Button('', key='13', auto_size_button=False, size=(6, 4))],
                 [sg.Button('', key='21', auto_size_button=False, size=(6, 4)),
-                sg.Button('', key='22', auto_size_button=False, size=(6, 4)),
-                sg.Button('', key='23', auto_size_button=False, size=(6, 4))],
+                 sg.Button('', key='22', auto_size_button=False, size=(6, 4)),
+                 sg.Button('', key='23', auto_size_button=False, size=(6, 4))],
                 [sg.Button('', key='31', auto_size_button=False, size=(6, 4)),
-                sg.Button('', key='32', auto_size_button=False, size=(6, 4)),
-                sg.Button('', key='33', auto_size_button=False, size=(6, 4))],
+                 sg.Button('', key='32', auto_size_button=False, size=(6, 4)),
+                 sg.Button('', key='33', auto_size_button=False, size=(6, 4))],
                 [sg.Button('', key='v', visible=False), sg.Button('Play again', key='a', visible=False)],
                 [sg.Button('', key='c1', auto_size_button=False, size=(3, 2)),
-                sg.Button('', key='c2', auto_size_button=False, size=(3, 2))]
+                 sg.Button('', key='c2', auto_size_button=False, size=(3, 2))]
                 ]
     else:
         return [[sg.Button('', key='11', auto_size_button=False, size=(6, 4)),
@@ -44,7 +43,6 @@ def printBoard(board):
 
 
 def checkVictory():
-
     oVictory = False
     xVictory = False
 
@@ -69,9 +67,10 @@ if __name__ == '__main__':
     player = 'O'
     game = True
     choosing = False
+    first = True
     index = 0
 
-    quantum = False  # make it true or false if tic tac toe is supposed to be quantum or not
+    quantum = True  # make it true or false if tic tac toe is supposed to be quantum or not
     computer = True  # make it true or false to play against computer or not
     computerFirst = True  # make it true or false for the computer to play first
 
@@ -85,6 +84,7 @@ if __name__ == '__main__':
 
         # print('Main Board')
         # printBoard(sb.getBoard())
+        # print(sb.isFull())
         # printBoard(sb.getCounters())
         # print('col: ', sb.getWinCol())
         # print('line: ', sb.getWinLine())
@@ -97,14 +97,15 @@ if __name__ == '__main__':
         else:
             remainder = 0
 
-        if not computer or not game:  # only ask for user input when it's the player's turn
+        # only ask for user input when it's the player's turn
+        if not computer or not game or choosing:
             event, values = window.Read()
-        elif index % 2 == remainder:
+        elif int(index) % 2 == remainder or choosing:
             event, values = window.Read()
 
-        if index % 2 == 0:  # alternate between X and O
+        if int(index) % 2 == 0:  # alternate between X and O
             player = 'X'
-        if index % 2 == 1:
+        if int(index) % 2 == 1:
             player = 'O'
 
         if event in ('Exit', None):  # if player wants to exit
@@ -115,37 +116,67 @@ if __name__ == '__main__':
         if quantum:
 
             # when the player chooses a tile
-            if game and not choosing and event not in ['a', 'v', 'c1', 'c2'] and \
-                    len(window[event].get_text()) <= 3 and checkVictory() == "banana" and\
-                    len(window[event].get_text()) != 1:
+            if (int(index) % 2 == remainder and computer) or not computer:
+                if game and not choosing and event not in ['a', 'v', 'c1', 'c2'] and \
+                        len(window[event].get_text()) <= 3 and checkVictory() == "banana" and \
+                        len(window[event].get_text()) != 1:
 
-                line = int(event[0]) - 1
-                col = int(event[1]) - 1
+                    line = int(event[0]) - 1
+                    col = int(event[1]) - 1
 
-                sb.play(line, col, player + str(int(index)))
-                if window[event].get_text() == '':
-                    window[event].update(text=player + str(int(index)))
+                    sb.play(line, col, player + str(int(index)))
+                    if window[event].get_text() == '':
+                        window[event].update(text=player + str(int(index)))
+                    else:
+                        window[event].update(text=window[event].get_text() + ' ' +
+                                                  player + str(int(index)))
+                    index += 0.5
+
+            # if second player is the computer
+            elif computer and game and int(index) % 2 == 1 - remainder and \
+                    not choosing and checkVictory() == "banana":
+
+                # sa = SA.SimpleAlgorithm(sb, player)  # initialize the simple opponent
+                sa = SA.Minimax(sb, player, quantum=True)  # initialize the minimax opponent
+
+                coord = sa.getMove()
+
+                if first:
+                    line = coord[0][0]
+                    col = coord[0][1]
+                    first = False
                 else:
-                    window[event].update(text=window[event].get_text() + ' ' + player + str(int(index)))
+                    line = coord[1][0]
+                    col = coord[1][1]
+                    first = True
+                sb.play(line, col, player + str(int(index)))
+                # Update the first move
+                name = str(line + 1) + str(col + 1)
+                text = window.FindElement(name).get_text()
+                if text == '':
+                    window.FindElement(name).update(text=player + str(int(index)))
+                else:
+                    window.FindElement(name).update(text=text + ' ' + player + str(int(index)))
                 index += 0.5
 
-                if index % 2 == 0 or index % 2 == 1:  # checks if there is a cycle
+            if index % 2 == 0 or index % 2 == 1:  # checks if there is a cycle
 
-                    if sb.sameSymbol(line, col):
-                        window[event].update(text=sb.getTile(line, col))
+                if sb.sameSymbol(line, col):
+                    name = str(line + 1) + str(col + 1)
+                    window.FindElement(name).update(text=sb.getTile(line, col))
 
-                    if sb.hasCycle(line, col):
-                        choosing = True
-                        message = sb.getMessage()
-                        window.FindElement('c1').Update(text=message[0])
-                        window.FindElement('c2').Update(text=message[1])
+                if sb.hasCycle(line, col):
+                    choosing = True
+                    message = sb.getMessage()
+                    window.FindElement('c1').Update(text=message[0])
+                    window.FindElement('c2').Update(text=message[1])
 
-            if event in ['c1', 'c2'] and choosing:
+            if choosing and event in ['c1', 'c2']:
                 choosing = False
                 sb.collapseUncertainty(window[event].get_text())  # collapse uncertainty
                 for i in range(3):
                     for j in range(3):
-                        window.FindElement(str(i+1)+str(j+1)).Update(text=sb.getTile(i, j))
+                        window.FindElement(str(i + 1) + str(j + 1)).Update(text=sb.getTile(i, j))
 
                 window.FindElement('c1').Update(text='')
                 window.FindElement('c2').Update(text='')
@@ -192,7 +223,7 @@ if __name__ == '__main__':
                 line = coord[0]
                 col = coord[1]
                 sb.play(line, col, player)
-                window.FindElement(str(line+1)+str(col+1)).update(text=player)
+                window.FindElement(str(line + 1) + str(col + 1)).update(text=player)
                 index += 1
 
             if checkVictory() != "banana":  # this is to show the 'you win' messages

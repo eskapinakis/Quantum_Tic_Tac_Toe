@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     quantum = False  # make it true or false if tic tac toe is supposed to be quantum or not
     computer = True  # make it true or false to play against computer or not
-    computerFirst = False
+    computerFirst = True  # make it true or false for the computer to play first
 
     window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
                        size=(400, 510), font='Any 14').Layout(makeLayout())
@@ -184,8 +184,10 @@ if __name__ == '__main__':
             # if second player is the computer
             elif computer and game and index % 2 == 1 - remainder and \
                     checkVictory() == "banana":
+
                 # sa = SA.SimpleAlgorithm(sb, player)  # initialize the simple opponent
                 sa = SA.Minimax(sb, player)  # initialize the minimax opponent
+
                 coord = sa.getMove()
                 line = coord[0]
                 col = coord[1]

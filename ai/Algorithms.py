@@ -4,8 +4,10 @@ class Algorithms:
     piece = ''
     other = ''
     move = None
+    preference = []
 
     def __init__(self, board, piece='O'):
+        
         self.board = None
         self.assignBoard(board)
 
@@ -17,10 +19,14 @@ class Algorithms:
 
         self.move = []
 
+        self.preference = [4, 0, 2, 6, 8, 1, 3, 5, 7]  # tiles by preference
+
     def assignBoard(self, board):
+        
         self.board = board
 
     def printBoard(self, board=None):
+        
         if not board:
             board = self.board
         for l in board.getBoard():
@@ -86,7 +92,7 @@ class Algorithms:
         return False
 
     @staticmethod
-    def twoWinningOptions(board, piece):  # to see if there are two winning moves for a player
+    def winningOptions(board, piece):  # counts the number of winning options
 
         winningMoves = 0
 
@@ -98,21 +104,12 @@ class Algorithms:
                         winningMoves += 1
                     board.eraseMove(i, j)
 
-        if winningMoves > 1:
-            return True
+        return winningMoves
 
-        return False
+    def twoWinningOptions(self, board, piece):
+        
+        return self.winningOptions(board, piece) >= 2
 
-    @staticmethod
-    def isThereWinningMove(board, piece):
-
-        for i in range(3):
-            for j in range(3):
-                if not board.isOccupied(i, j):
-                    board.play(i, j, piece)
-                    if board.checkVictory(piece):
-                        board.eraseMove(i, j)
-                        return True
-                    board.eraseMove(i, j)
-
-        return False
+    def isThereWinningMove(self, board, piece):
+        
+        return self.winningOptions(board, piece) >= 1

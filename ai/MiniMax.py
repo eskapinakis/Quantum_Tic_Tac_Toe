@@ -35,9 +35,9 @@ class Minimax(Alg.Algorithms):
     def evalTerminal(self, node):
 
         if node.isWinning(self.other):
-            return -10
+            return -1
         elif node.isWinning(self.piece):
-            return 10
+            return 1
 
         '''
         # In next move
@@ -64,7 +64,7 @@ class Minimax(Alg.Algorithms):
 
     def generateChildren(self, node, player):
 
-        for i in range(9):
+        for i in self.preference:
             line = self.getCoordinates(i)[0]
             col = self.getCoordinates(i)[1]
 

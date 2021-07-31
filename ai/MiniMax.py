@@ -8,6 +8,7 @@ class Minimax(Alg.Algorithms):
 
     root = None
     quantum = False
+    index = 0
 
     def __init__(self, board, player, quantum=False):
 
@@ -15,6 +16,7 @@ class Minimax(Alg.Algorithms):
 
         self.root = Node.Node(board=board)
         self.quantum = quantum
+        self.index = 0
 
     def getMove(self):
 
@@ -25,7 +27,6 @@ class Minimax(Alg.Algorithms):
         bestChild = self.root.getChildren()[0]
 
         for child in self.root.getChildren():
-            # eval = self.minimax(child, 5, False)  # It's now the other guy's move
             eval = self.pruningMinimax(child, 5, -inf, inf, False)
             # print('eval: ', eval, child.getMove())
             # eval = 0
@@ -101,10 +102,32 @@ class Minimax(Alg.Algorithms):
 
                 if not board.isOccupied(line1, col1) and \
                         not board.isOccupied(line2, col2):
-                    board.play(line1, col1, player)
-                    board.play(line2, col2, player)
-                    child = Node.Node(node, board, [line1, col1], [line2, col2])
-                    node.addChildren(child)
+                    board.play(line1, col1, player+str(self.index))  # TODO -> increase index
+                    board.play(line2, col2, player+str(self.index))
+                    children = self.getChildren(node, board, line1, col1, line2, col2)
+                    for child in children:
+                        node.addChildren(child)
+
+    @staticmethod
+    def getChildren(node, board, line1, col1, line2, col2):
+        if board.sameSymbol(line2, col2) or not board.hasCycle(line2, col2):
+            return [Node.Node(node, board, [line1, col1], [line2, col2])]
+        else:
+            tile = board.getTile(line2, col2)
+            choice1 = tile[0]+tile[1]
+            choice2 = tile[3]+tile[4]
+
+            board1 = Q.QuantumTicTacToe()  # create a new board
+            board1.copyTiles(board.getBoard())
+            board1.collapseUncertainty(choice1)
+            child1 = Node.Node(node, board1, [line1, col1], [line2, col2])
+
+            board2 = Q.QuantumTicTacToe()  # create a new board
+            board2.copyTiles(board.getBoard())
+            board2.collapseUncertainty(choice2)
+            child2 = Node.Node(node, board2, [line1, col1], [line2, col2])
+
+            return [child1, child2]
 
     def minimax(self, node, depth, maximizing):
 

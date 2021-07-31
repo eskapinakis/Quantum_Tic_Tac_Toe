@@ -53,9 +53,9 @@ if __name__ == '__main__':
     line = 0
     col = 0
 
-    quantum = False  # make it true or false if tic tac toe is supposed to be quantum or not
-    computer = True  # make it true or false to play against computer or not
-    computerFirst = True  # make it true or false for the computer to play first
+    quantum = True  # make it true or false if tic tac toe is supposed to be quantum or not
+    computer = False  # make it true or false to play against computer or not
+    computerFirst = False  # make it true or false for the computer to play first
 
     window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
                        size=(400, 510), font='Any 14').Layout(makeLayout())
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     while True:
 
         # print('Main Board')
-        # printBoard(rb.getBoard())
+        # printBoard(qb.getBoard())
         # print(sb.isFull())
         # printBoard(sb.getCounters())
         # print('col: ', sb.getWinCol())

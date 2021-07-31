@@ -25,6 +25,12 @@ class QuantumTicTacToe(Board.Board):
         self.initialTile = []
         self.cycle = []
 
+    def copyCycle(self, cycle):
+        self.cycle = cycle
+
+    def getCycle(self):
+        return self.cycle
+
     def getWinCol(self):
         return self.winingCol
 
@@ -202,6 +208,8 @@ class QuantumTicTacToe(Board.Board):
 
     def collapseUncertainty(self, choice):
 
+        # print('choice: ', choice)
+        # print('cycle in collapse: ', self.cycle)
         i = len(self.cycle)-1
         tileCoordinate = self.cycle[i]
 

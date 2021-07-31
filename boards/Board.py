@@ -10,8 +10,12 @@ class Board:
             for j in range(3):
                 self.tiles[i][j] = tiles[i][j]
 
+    def isEmpty(self, line, col):
+        return self.tiles[line][col] == ''
+
     def isOccupied(self, line, col):
-        return len(self.tiles[line][col]) in [1, 5]  # also works for quantum
+        return len(self.tiles[line][col]) == 1 or \
+            len(self.tiles[line][col]) > 3  # also works for quantum
 
     def getLine(self, i):
         return self.tiles[i]

@@ -27,9 +27,9 @@ class Minimax(Alg.Algorithms):
         bestChild = self.root.getChildren()[0]
 
         for child in self.root.getChildren():
-            # eval = self.pruningMinimax(child, 0, -inf, inf, False)
+            eval = self.pruningMinimax(child, 0, -inf, inf, False, self.index+1)
             # print('eval: ', eval, child.getMove())
-            eval = 0
+            # eval = 0
             if eval > best:
                 bestChild = child
                 best = eval
@@ -90,7 +90,7 @@ class Minimax(Alg.Algorithms):
 
     def generateQuantumChildren(self, node, player, index):
         for i in range(9):
-            for j in range(i, 9):
+            for j in range(9):
                 line1 = self.getCoordinates(i)[0]
                 col1 = self.getCoordinates(i)[1]
 
@@ -100,7 +100,13 @@ class Minimax(Alg.Algorithms):
                 board = Q.QuantumTicTacToe()  # create a new board
                 board.copyTiles(node.getBoard().getBoard())
 
-                if not board.isOccupied(line1, col1) and \
+                if [line1, col1] == [line1, col2] and board.isEmpty(line1, col1):
+                    board.play(line1, col1, player)
+                    # self.printBoard(board)
+                    child = Node.Node(node, board, [line1, col1], [line2, col2])
+                    node.addChildren(child)
+
+                elif not board.isOccupied(line1, col1) and \
                         not board.isOccupied(line2, col2):
                     board.play(line1, col1, player+str(index))
                     board.play(line2, col2, player+str(index))
@@ -109,10 +115,9 @@ class Minimax(Alg.Algorithms):
                     for child in children:
                         node.addChildren(child)
 
-    @staticmethod
+    @staticmethod  # self
     def getChildren(node, board, line1, col1, line2, col2):
-        if board.sameSymbol(line2, col2) or not board.hasCycle(line2, col2):
-            return [Node.Node(node, board, [line1, col1], [line2, col2])]
+        # self.printBoard(board)
 
         if board.hasCycle(line2, col2):
 
@@ -133,6 +138,11 @@ class Minimax(Alg.Algorithms):
             child2 = Node.Node(node, board2, [line1, col1], [line2, col2])
 
             return [child1, child2]
+
+        else:
+
+            child = Node.Node(node, board, [line1, col1], [line2, col2])
+            return [child]
 
     def minimax(self, node, depth, maximizing):
 

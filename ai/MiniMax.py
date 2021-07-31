@@ -8,26 +8,28 @@ class Minimax(Alg.Algorithms):
 
     root = None
     quantum = False
+    index = 0
 
-    def __init__(self, board, player, quantum=False):
+    def __init__(self, board, player, quantum=False, index=0):
 
         super().__init__(board, player)
 
         self.root = Node.Node(board=board)
         self.quantum = quantum
+        self.index = index
 
     def getMove(self):
 
         best = - inf
 
         # Make the first generation
-        self.generateChildren(self.root, self.piece)
+        self.generateChildren(self.root, self.piece, self.index)
         bestChild = self.root.getChildren()[0]
 
         for child in self.root.getChildren():
-            eval = self.pruningMinimax(child, 5, -inf, inf, False)
+            # eval = self.pruningMinimax(child, 0, -inf, inf, False)
             # print('eval: ', eval, child.getMove())
-            # eval = 0
+            eval = 0
             if eval > best:
                 bestChild = child
                 best = eval
@@ -66,12 +68,12 @@ class Minimax(Alg.Algorithms):
         '''
         return 0
 
-    def generateChildren(self, node, player):
+    def generateChildren(self, node, player, index=0):
 
         if not self.quantum:
             self.generateRegularChildren(node, player)
         if self.quantum:
-            self.generateQuantumChildren(node, player)
+            self.generateQuantumChildren(node, player, index)
 
     def generateRegularChildren(self, node, player):
         for i in self.preference:  # range(9):
@@ -86,9 +88,9 @@ class Minimax(Alg.Algorithms):
                 child = Node.Node(node, board, [line, col])  # [line, col] is the child's move
                 node.addChildren(child)
 
-    def generateQuantumChildren(self, node, player):
+    def generateQuantumChildren(self, node, player, index):
         for i in range(9):
-            for j in range(9):
+            for j in range(i, 9):
                 line1 = self.getCoordinates(i)[0]
                 col1 = self.getCoordinates(i)[1]
 
@@ -100,18 +102,17 @@ class Minimax(Alg.Algorithms):
 
                 if not board.isOccupied(line1, col1) and \
                         not board.isOccupied(line2, col2):
-                    index = node.getIndex()
-                    board.play(line1, col1, player+str(index))  # TODO -> increase index
+                    board.play(line1, col1, player+str(index))
                     board.play(line2, col2, player+str(index))
+
                     children = self.getChildren(node, board, line1, col1, line2, col2)
                     for child in children:
                         node.addChildren(child)
 
     @staticmethod
     def getChildren(node, board, line1, col1, line2, col2):
-        index = node.getIndex() + 1
         if board.sameSymbol(line2, col2) or not board.hasCycle(line2, col2):
-            return [Node.Node(node, board, [line1, col1], [line2, col2], index)]
+            return [Node.Node(node, board, [line1, col1], [line2, col2])]
 
         if board.hasCycle(line2, col2):
 
@@ -123,13 +124,13 @@ class Minimax(Alg.Algorithms):
             board1.copyTiles(board.getBoard())
             board1.copyCycle(board.getCycle())
             board1.collapseUncertainty(choice1)
-            child1 = Node.Node(node, board1, [line1, col1], [line2, col2], index)
+            child1 = Node.Node(node, board1, [line1, col1], [line2, col2])
 
             board2 = Q.QuantumTicTacToe()  # create a new board with the same cycle
             board2.copyTiles(board.getBoard())
             board2.copyCycle(board.getCycle())
             board2.collapseUncertainty(choice2)
-            child2 = Node.Node(node, board2, [line1, col1], [line2, col2], index)
+            child2 = Node.Node(node, board2, [line1, col1], [line2, col2])
 
             return [child1, child2]
 
@@ -160,7 +161,7 @@ class Minimax(Alg.Algorithms):
             return minEval
 
     # minima with alpha beta pruning
-    def pruningMinimax(self, node, depth, alpha, beta, maximizing):
+    def pruningMinimax(self, node, depth, alpha, beta, maximizing, index=0):
 
         if depth == 0 or node.isWinning(self.piece) or node.isWinning(self.other) or \
                 node.isFull():
@@ -168,10 +169,10 @@ class Minimax(Alg.Algorithms):
 
         if maximizing:
 
-            self.generateChildren(node, self.piece)  # it's my turn
+            self.generateChildren(node, self.piece, index)  # it's my turn
             maxEval = -inf
             for child in node.children:
-                eval = self.pruningMinimax(child, depth - 1, alpha, beta, False)
+                eval = self.pruningMinimax(child, depth - 1, alpha, beta, False, index + 1)
                 maxEval = max(maxEval, eval)
                 alpha = max(alpha, eval)
                 if beta <= alpha:
@@ -180,10 +181,10 @@ class Minimax(Alg.Algorithms):
 
         else:
 
-            self.generateChildren(node, self.other)  # it's your turn
+            self.generateChildren(node, self.other, index)  # it's your turn
             minEval = inf
             for child in node.children:
-                eval = self.pruningMinimax(child, depth - 1, alpha, beta, True)
+                eval = self.pruningMinimax(child, depth - 1, alpha, beta, True, index + 1)
                 minEval = min(minEval, eval)
                 beta = min(beta, eval)
                 if beta <= alpha:

@@ -54,7 +54,7 @@ if __name__ == '__main__':
     col = 0
 
     quantum = True  # make it true or false if tic tac toe is supposed to be quantum or not
-    computer = False  # make it true or false to play against computer or not
+    computer = True  # make it true or false to play against computer or not
     computerFirst = False  # make it true or false for the computer to play first
 
     window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
@@ -120,7 +120,7 @@ if __name__ == '__main__':
                     not choosing and qb.getWinner() == "banana":
 
                 # sa = SA.SimpleAlgorithm(sb, player)  # initialize the simple opponent
-                sa = SA.Minimax(qb, player, quantum=True)  # initialize the minimax opponent
+                sa = SA.Minimax(qb, player, True, int(index))  # initialize the minimax opponent
 
                 coord = sa.getMove()
 

@@ -5,15 +5,13 @@ class Node:
     move = None
     move2 = None
     children = []
-    index = 0
 
-    def __init__(self, node=None, board=None, move=None, move2=None, index=0):
+    def __init__(self, node=None, board=None, move=None, move2=None):
         self.children = []
         self.father = node
         self.board = board
         self.move = move
         self.move2 = move2
-        self.index = index
 
     def getIndex(self):
         return self.index

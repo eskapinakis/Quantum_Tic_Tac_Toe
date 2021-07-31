@@ -1,6 +1,3 @@
-from boards import TicTacToe as SB
-
-
 class Node:
 
     father = None
@@ -12,9 +9,7 @@ class Node:
     def __init__(self, node=None, board=None, move=None, move2=None):
         self.children = []
         self.father = node
-        self.board = SB.SmallBoard()
-        if board:
-            self.board.copyTiles(board.getBoard())
+        self.board = board
         self.move = move
         self.move2 = move2
 
@@ -40,7 +35,7 @@ class Node:
         return self.move2
 
     def isWinning(self, player):
-        return self.board.checkVictory(player)
+        return self.board.getWinner() == player + " has won"
 
     def copyBoard(self, tiles):
         self.board.copyTiles(tiles)

@@ -1,5 +1,5 @@
 from data_structures import Node
-from boards import TicTacToe as SB
+from boards import QuantumTicTacToe as Q, RegularTicTacToe as T
 from math import inf
 from ai import Algorithms as Alg
 
@@ -9,12 +9,11 @@ class Minimax(Alg.Algorithms):
     root = None
     quantum = False
 
-    def __init__(self, board, player, quantum = False):
+    def __init__(self, board, player, quantum=False):
 
         super().__init__(board, player)
 
-        self.root = Node.Node()
-        self.root.copyBoard(board.getBoard())
+        self.root = Node.Node(board=board)
         self.quantum = quantum
 
     def getMove(self):
@@ -27,8 +26,9 @@ class Minimax(Alg.Algorithms):
 
         for child in self.root.getChildren():
             # eval = self.minimax(child, 5, False)  # It's now the other guy's move
-            # eval = self.pruningMinimax(child, 5, -inf, inf, False)
-            eval = 0
+            eval = self.pruningMinimax(child, 5, -inf, inf, False)
+            # print('eval: ', eval, child.getMove())
+            # eval = 0
             if eval > best:
                 bestChild = child
                 best = eval
@@ -70,37 +70,41 @@ class Minimax(Alg.Algorithms):
     def generateChildren(self, node, player):
 
         if not self.quantum:
+            self.generateRegularChildren(node, player)
+        if self.quantum:
+            self.generateQuantumChildren(node, player)
 
-            for i in self.preference:  # range(9):
-                line = self.getCoordinates(i)[0]
-                col = self.getCoordinates(i)[1]
+    def generateRegularChildren(self, node, player):
+        for i in self.preference:  # range(9):
+            line = self.getCoordinates(i)[0]
+            col = self.getCoordinates(i)[1]
 
-                board = SB.SmallBoard()  # create a new board
+            board = T.RegularTicTacToe()  # create a new board
+            board.copyTiles(node.getBoard().getBoard())
+
+            if not board.isOccupied(line, col):
+                board.play(line, col, player)
+                child = Node.Node(node, board, [line, col])  # [line, col] is the child's move
+                node.addChildren(child)
+
+    def generateQuantumChildren(self, node, player):
+        for i in range(9):
+            for j in range(9):
+                line1 = self.getCoordinates(i)[0]
+                col1 = self.getCoordinates(i)[1]
+
+                line2 = self.getCoordinates(j)[0]
+                col2 = self.getCoordinates(j)[1]
+
+                board = Q.QuantumTicTacToe()  # create a new board
                 board.copyTiles(node.getBoard().getBoard())
 
-                if not board.isOccupied(line, col):
-                    board.play(line, col, player)
-                    child = Node.Node(node, board, [line, col])  # [line, col] is the child's move
+                if not board.isOccupied(line1, col1) and \
+                        not board.isOccupied(line2, col2):
+                    board.play(line1, col1, player)
+                    board.play(line2, col2, player)
+                    child = Node.Node(node, board, [line1, col1], [line2, col2])
                     node.addChildren(child)
-
-        if self.quantum:
-            for i in range(9):
-                for j in range(9):
-                    line1 = self.getCoordinates(i)[0]
-                    col1 = self.getCoordinates(i)[1]
-
-                    line2 = self.getCoordinates(j)[0]
-                    col2 = self.getCoordinates(j)[1]
-
-                    board = SB.SmallBoard()  # create a new board
-                    board.copyTiles(node.getBoard().getBoard())
-
-                    if not board.isOccupied(line1, col1) and \
-                            not board.isOccupied(line2, col2):
-                        board.play(line1, col1, player)
-                        board.play(line2, col2, player)
-                        child = Node.Node(node, board, [line1, col1], [line2, col2])
-                        node.addChildren(child)
 
     def minimax(self, node, depth, maximizing):
 

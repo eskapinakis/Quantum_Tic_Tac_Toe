@@ -5,7 +5,17 @@ import PySimpleGUI as sg
 from ai import MiniMax as SA  # To use the minimax algorithm
 
 
-def makeLayout():
+def makeLayout(is_quantum=False, two_players=False):
+
+    if is_quantum:
+        return [[sg.Button('Quantum', key='quantum', auto_size_button=False, size=(8, 4)),
+                 sg.Button('Regular', key='regular', auto_size_button=False, size=(7, 4))]
+                ]
+    if two_players:
+        return [[sg.Button('Two Players', key='two', auto_size_button=False, size=(7, 4)),
+                 sg.Button('Against Computer', key='one', auto_size_button=False, size=(8, 4))]
+                ]
+
     if quantum:
         return [[sg.Button('', key='11', auto_size_button=False, size=(6, 4)),
                  sg.Button('', key='12', auto_size_button=False, size=(6, 4)),
@@ -38,9 +48,29 @@ rb = R.RegularTicTacToe()  # regular board
 qb = Q.QuantumTicTacToe()  # quantum board
 
 
-def printBoard(board):
-    for l in board:
-        print(l)
+def menu():
+
+    isQuantum = False
+    isComputer = False
+
+    menuWindow = sg.Window('Menu', default_element_size=(12, 12), margins=(70, 50),
+                           size=(400, 510), font='Any 14').Layout(makeLayout(True))
+    event1, values1 = menuWindow.Read()
+    menuWindow.close()
+
+    if event1 == 'quantum':
+        isQuantum = True
+
+    menuWindow = sg.Window('Menu', default_element_size=(12, 12), margins=(70, 50),
+                           size=(400, 510), font='Any 14').Layout(makeLayout(False, True))
+    event1, values1 = menuWindow.Read()
+
+    if event1 == 'one':
+        isComputer = True
+
+    menuWindow.close()
+
+    return [isQuantum, isComputer]
 
 
 if __name__ == '__main__':
@@ -52,10 +82,15 @@ if __name__ == '__main__':
     index = 0
     line = 0
     col = 0
+    window = None
 
     quantum = True  # make it true or false if tic tac toe is supposed to be quantum or not
     computer = True  # make it true or false to play against computer or not
     computerFirst = False  # make it true or false for the computer to play first
+
+    choice = menu()
+    quantum = choice[0]
+    computer = choice[1]
 
     window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
                        size=(400, 510), font='Any 14').Layout(makeLayout())
@@ -175,9 +210,16 @@ if __name__ == '__main__':
                 game = True
                 qb = Q.QuantumTicTacToe()
                 window.close()
-                window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
-                                   size=(400, 510), font='Any 14').Layout(makeLayout())
+
+                choice = menu()
+                quantum = choice[0]
+                computer = choice[1]
+
+                window = sg.Window('Quantum Tic Tac Toe',
+                                   default_element_size=(12, 12), margins=(70, 50), size=(400, 510),
+                                   font='Any 14').Layout(makeLayout())
                 window.Finalize()
+                computerFirst = computerFirst is False
 
         # Regular Tic Tac Toe
 
@@ -221,8 +263,14 @@ if __name__ == '__main__':
             if not game and event == 'a':  # this is just to reset the game
                 game = True
                 window.close()
+
+                choice = menu()
+                quantum = choice[0]
+                computer = choice[1]
+
                 window = sg.Window('Quantum Tic Tac Toe', default_element_size=(12, 12), margins=(70, 50),
                                    size=(400, 510), font='Any 14').Layout(makeLayout())
                 window.Finalize()
+                computerFirst = computerFirst is False
 
         window.Refresh()

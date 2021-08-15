@@ -9,6 +9,7 @@ class Minimax(Alg.Algorithms):
     root = None
     quantum = False
     index = 0
+    depth = 0
 
     def __init__(self, board, player, quantum=False, index=0):
 
@@ -17,6 +18,11 @@ class Minimax(Alg.Algorithms):
         self.root = Node.Node(board=board)
         self.quantum = quantum
         self.index = index
+
+        if quantum:
+            self.depth = 0
+        else:
+            self.depth = 6
 
     def getMove(self):
 
@@ -27,9 +33,10 @@ class Minimax(Alg.Algorithms):
         bestChild = self.root.getChildren()[0]
 
         for child in self.root.getChildren():
-            eval = self.pruningMinimax(child, 0, -inf, inf, False, self.index+1)
-            # print('eval: ', eval, child.getMove())
-            # eval = 0
+            if not self.quantum:
+                eval = self.pruningMinimax(child, self.depth, -inf, inf, False, self.index+1)
+            else:
+                eval = 0
             if eval > best:
                 bestChild = child
                 best = eval
@@ -44,28 +51,6 @@ class Minimax(Alg.Algorithms):
             return -1
         elif node.isWinning(self.piece):
             return 1
-
-        '''
-        # In next move
-        elif self.isThereWinningMove(node.getBoard(), self.other):
-            return -10
-        elif self.isThereWinningMove(node.getBoard(), self.piece):
-            return 10
-
-        # In two next moves
-        elif self.enablesTwoOptions(node.getBoard(), self.other):
-            return -5
-        elif self.enablesTwoOptions(node.getBoard(), self.piece):
-            return 5
-
-        # Some Heuristics
-        elif node.getBoard().getTile(1, 1) == self.other:
-            return -2
-        elif node.getBoard().getTile(1, 1) == self.piece:
-            return 2
-        
-        # Nhe
-        '''
         return 0
 
     def generateChildren(self, node, player, index=0):
@@ -170,7 +155,7 @@ class Minimax(Alg.Algorithms):
                 minEval = min(minEval, eval)
             return minEval
 
-    # minima with alpha beta pruning
+    # minimax with alpha beta pruning
     def pruningMinimax(self, node, depth, alpha, beta, maximizing, index=0):
 
         if depth == 0 or node.isWinning(self.piece) or node.isWinning(self.other) or \

@@ -22,7 +22,6 @@ class Algorithms:
         self.preference = [0, 2, 4, 6, 8, 1, 3, 5, 7]  # tiles by preference
 
     def assignBoard(self, board):
-
         self.board = board
 
     def printBoard(self, board=None):

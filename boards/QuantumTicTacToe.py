@@ -152,9 +152,6 @@ class QuantumTicTacToe(Board.Board):
         tile = self.tiles[tileCoordinates[0]][tileCoordinates[1]]
         return [str(tile[0]) + str(tile[1]), str(tile[3]) + str(tile[4])]
 
-    def getCycle(self):
-        return self.cycle
-
     def hasCycle(self, line, col):  # checks if there is a cycle starting in this tile
         if self.sameSymbol(line, col):
             return False
@@ -163,7 +160,7 @@ class QuantumTicTacToe(Board.Board):
         self.initialTile = [line, col]  # to know where you pass through
         tile = self.tiles[line][col]
 
-        if len(tile) <= 2 or tile[1] == tile[4]:
+        if len(tile) < 5 or tile[1] == tile[4]:
             return False
 
         nextTile = self.findIndex(tile[1], [line, col])
@@ -175,7 +172,7 @@ class QuantumTicTacToe(Board.Board):
     def sameSymbol(self, line, col):
         tile = self.tiles[line][col]
 
-        if len(tile) <= 3:
+        if len(tile) < 5:
             return False
 
         if tile[0]+tile[1] == tile[3]+tile[4]:
@@ -208,8 +205,6 @@ class QuantumTicTacToe(Board.Board):
 
     def collapseUncertainty(self, choice):
 
-        # print('choice: ', choice)
-        # print('cycle in collapse: ', self.cycle)
         i = len(self.cycle)-1
         tileCoordinate = self.cycle[i]
 

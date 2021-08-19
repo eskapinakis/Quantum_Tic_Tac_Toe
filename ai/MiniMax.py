@@ -25,18 +25,13 @@ class Minimax(Alg.Algorithms):
             self.depth = 6
 
     def getMove(self):
-
-        best = - inf
-
         # Make the first generation
         self.generateChildren(self.root, self.piece, self.index)
         bestChild = self.root.getChildren()[0]
+        best = - inf
 
         for child in self.root.getChildren():
-            if not self.quantum:
-                eval = self.pruningMinimax(child, self.depth, -inf, inf, False, self.index+1)
-            else:
-                eval = 0
+            eval = self.pruningMinimax(child, self.depth, -inf, inf, False, self.index+1)
             if eval > best:
                 bestChild = child
                 best = eval
@@ -46,22 +41,21 @@ class Minimax(Alg.Algorithms):
             return [bestChild.getMove(), bestChild.getMove2()]
 
     def evalTerminal(self, node):
-
         if node.isWinning(self.other):
             return -1
         elif node.isWinning(self.piece):
             return 1
         return 0
 
+    # creates the next generation
     def generateChildren(self, node, player, index=0):
-
-        if not self.quantum:
-            self.generateRegularChildren(node, player)
         if self.quantum:
             self.generateQuantumChildren(node, player, index)
+        else:
+            self.generateRegularChildren(node, player)
 
     def generateRegularChildren(self, node, player):
-        for i in self.preference:  # range(9):
+        for i in range(9):
             line = self.getCoordinates(i)[0]
             col = self.getCoordinates(i)[1]
 
@@ -74,6 +68,7 @@ class Minimax(Alg.Algorithms):
                 node.addChildren(child)
 
     def generateQuantumChildren(self, node, player, index):
+
         for i in range(9):
             for j in range(9):
                 line1 = self.getCoordinates(i)[0]
@@ -85,24 +80,30 @@ class Minimax(Alg.Algorithms):
                 board = Q.QuantumTicTacToe()  # create a new board
                 board.copyTiles(node.getBoard().getBoard())
 
-                if [line1, col1] == [line1, col2] and board.isEmpty(line1, col1):
+                if [line1, col1] == [line2, col2] and board.isEmpty(line1, col1):
+
                     board.play(line1, col1, player)
                     # self.printBoard(board)
                     child = Node.Node(node, board, [line1, col1], [line2, col2])
                     node.addChildren(child)
 
-                elif not board.isOccupied(line1, col1) and \
-                        not board.isOccupied(line2, col2):
+                elif not board.isOccupied(line1, col1) and not board.isOccupied(line2, col2):
+
                     board.play(line1, col1, player+str(index))
                     board.play(line2, col2, player+str(index))
 
-                    children = self.getChildren(node, board, line1, col1, line2, col2)
-                    for child in children:
-                        node.addChildren(child)
+                    # children = self.getChildren(node, board, line1, col1, line2, col2)
+                    # for child in children:
+
+                    child = Node.Node(node, board, [line1, col1], [line2, col2])
+                    node.addChildren(child)
+                # print('child board')
+                # board.printBoard()
+                # print('mother board')
+                # node.getBoard().printBoard()
 
     @staticmethod  # self
     def getChildren(node, board, line1, col1, line2, col2):
-        # self.printBoard(board)
 
         if board.hasCycle(line2, col2):
 

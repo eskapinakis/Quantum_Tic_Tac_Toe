@@ -101,7 +101,8 @@ if __name__ == '__main__':
     while True:
 
         # print('Main Board')
-        # printBoard(qb.getBoard())
+        qb.printBoard()
+        # print(qb.isOccupied(0, 0))
         # print(sb.isFull())
         # printBoard(sb.getCounters())
         # print('col: ', sb.getWinCol())

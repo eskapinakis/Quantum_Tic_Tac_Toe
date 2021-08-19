@@ -28,8 +28,7 @@ class Algorithms:
 
         if not board:
             board = self.board
-        for l in board.getBoard():
-            print(l)
+        board.printBoard()
 
     @staticmethod
     def getCoordinates(index):

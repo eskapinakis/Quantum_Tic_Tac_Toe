@@ -69,3 +69,7 @@ class Board:
                 if not self.isOccupied(i, j):
                     return False
         return True
+
+    def printBoard(self):
+        for l in self.tiles:
+            print(l)

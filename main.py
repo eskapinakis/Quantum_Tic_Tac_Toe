@@ -5,8 +5,14 @@ import PySimpleGUI as sg
 from ai import MiniMax as SA  # To use the minimax algorithm
 
 
+quantum = True  # make it true or false if tic tac toe is supposed to be quantum or not
+computer = True  # make it true or false to play against computer or not
+computerFirst = False  # make it true or false for the computer to play first
+
+
 def makeLayout(is_quantum=False, two_players=False):
 
+    # these are for the use to choose the kind of game
     if is_quantum:
         return [[sg.Button('Quantum', key='quantum', auto_size_button=False, size=(8, 4)),
                  sg.Button('Regular', key='regular', auto_size_button=False, size=(7, 4))]
@@ -82,11 +88,6 @@ if __name__ == '__main__':
     index = 0
     line = 0
     col = 0
-    window = None
-
-    quantum = True  # make it true or false if tic tac toe is supposed to be quantum or not
-    computer = True  # make it true or false to play against computer or not
-    computerFirst = False  # make it true or false for the computer to play first
 
     choice = menu()
     quantum = choice[0]
@@ -101,7 +102,7 @@ if __name__ == '__main__':
     while True:
 
         # print('Main Board')
-        qb.printBoard()
+        # qb.printBoard()
         # print(qb.isOccupied(0, 0))
         # print(sb.isFull())
         # printBoard(sb.getCounters())

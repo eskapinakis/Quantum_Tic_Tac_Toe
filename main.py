@@ -170,6 +170,7 @@ if __name__ == '__main__':
                     col = coord[1][1]
                     first = True
                 qb.play(line, col, player + str(int(index)))
+
                 # Update the first move
                 name = str(line + 1) + str(col + 1)
                 text = window.FindElement(name).get_text()

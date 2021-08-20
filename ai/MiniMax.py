@@ -70,33 +70,34 @@ class Minimax(Alg.Algorithms):
     def generateQuantumChildren(self, node, player, index):
 
         for i in range(9):
+            line1 = self.getCoordinates(i)[0]  # get the first move
+            col1 = self.getCoordinates(i)[1]
             for j in range(9):
-                line1 = self.getCoordinates(i)[0]
-                col1 = self.getCoordinates(i)[1]
-
-                line2 = self.getCoordinates(j)[0]
+                line2 = self.getCoordinates(j)[0]  # get the second move
                 col2 = self.getCoordinates(j)[1]
 
                 board = Q.QuantumTicTacToe()  # create a new board
                 board.copyTiles(node.getBoard().getBoard())
 
-                if [line1, col1] == [line2, col2] and board.isEmpty(line1, col1):
+                if i == j and board.isEmpty(line1, col1):  # deterministic move
 
                     board.play(line1, col1, player)
-                    # self.printBoard(board)
+                    board.printBoard()
                     child = Node.Node(node, board, [line1, col1], [line2, col2])
                     node.addChildren(child)
+                    node.getBoard().printBoard()
 
                 elif not board.isOccupied(line1, col1) and not board.isOccupied(line2, col2):
 
                     board.play(line1, col1, player+str(index))
                     board.play(line2, col2, player+str(index))
 
-                    # children = self.getChildren(node, board, line1, col1, line2, col2)
-                    # for child in children:
+                    children = self.getChildren(node, board, line1, col1, line2, col2)
+                    for child in children:
+                        node.addChildren(child)
 
-                    child = Node.Node(node, board, [line1, col1], [line2, col2])
-                    node.addChildren(child)
+                    # child = Node.Node(node, board, [line1, col1], [line2, col2])
+                    # node.addChildren(child)
                 # print('child board')
                 # board.printBoard()
                 # print('mother board')

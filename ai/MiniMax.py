@@ -10,6 +10,7 @@ class Minimax(Alg.Algorithms):
     quantum = False
     index = 0
     depth = 0
+    banana = 0  # to let a person plays twice
 
     def __init__(self, board, player, quantum=False, index=0):
 
@@ -24,6 +25,8 @@ class Minimax(Alg.Algorithms):
         else:
             self.depth = 6
 
+        self.banana = 0
+
     def getMove(self):
         # Make the first generation
         self.generateChildren(self.root, self.piece, self.index)
@@ -35,10 +38,7 @@ class Minimax(Alg.Algorithms):
             if eval > best:
                 bestChild = child
                 best = eval
-        if not self.quantum:
-            return bestChild.getMove()
-        else:
-            return [bestChild.getMove(), bestChild.getMove2()]
+        return bestChild.getMove()
 
     def evalTerminal(self, node):
         if node.isWinning(self.other):
@@ -54,6 +54,7 @@ class Minimax(Alg.Algorithms):
         else:
             self.generateRegularChildren(node, player)
 
+    # only the next generation
     def generateRegularChildren(self, node, player):
         for i in range(9):
             line = self.getCoordinates(i)[0]
@@ -67,48 +68,28 @@ class Minimax(Alg.Algorithms):
                 child = Node.Node(node, board, [line, col])  # [line, col] is the child's move
                 node.addChildren(child)
 
+    # only the next generation
     def generateQuantumChildren(self, node, player, index):
 
         for i in range(9):
-            line1 = self.getCoordinates(i)[0]  # get the first move
-            col1 = self.getCoordinates(i)[1]
-            for j in range(9):
-                line2 = self.getCoordinates(j)[0]  # get the second move
-                col2 = self.getCoordinates(j)[1]
+            line = self.getCoordinates(i)[0]  # get the first move
+            col = self.getCoordinates(i)[1]
 
-                board = Q.QuantumTicTacToe()  # create a new board
-                board.copyTiles(node.getBoard().getBoard())
+            board = Q.QuantumTicTacToe()  # create a new board
+            board.copyTiles(node.getBoard().getBoard())
 
-                if i == j and board.isEmpty(line1, col1):  # deterministic move
-
-                    board.play(line1, col1, player)
-                    board.printBoard()
-                    child = Node.Node(node, board, [line1, col1], [line2, col2])
+            if not board.isOccupied(line, col):
+                board.play(line, col, player+str(index))
+                children = self.getChildren(node, board, line, col)
+                for child in children:
                     node.addChildren(child)
-                    node.getBoard().printBoard()
 
-                elif not board.isOccupied(line1, col1) and not board.isOccupied(line2, col2):
+    @staticmethod
+    def getChildren(node, board, line, col):
 
-                    board.play(line1, col1, player+str(index))
-                    board.play(line2, col2, player+str(index))
+        if board.hasCycle(line, col):
 
-                    children = self.getChildren(node, board, line1, col1, line2, col2)
-                    for child in children:
-                        node.addChildren(child)
-
-                    # child = Node.Node(node, board, [line1, col1], [line2, col2])
-                    # node.addChildren(child)
-                # print('child board')
-                # board.printBoard()
-                # print('mother board')
-                # node.getBoard().printBoard()
-
-    @staticmethod  # self
-    def getChildren(node, board, line1, col1, line2, col2):
-
-        if board.hasCycle(line2, col2):
-
-            tile = board.getTile(line2, col2)
+            tile = board.getTile(line, col)
             choice1 = tile[0]+tile[1]
             choice2 = tile[3]+tile[4]
 
@@ -116,19 +97,19 @@ class Minimax(Alg.Algorithms):
             board1.copyTiles(board.getBoard())
             board1.copyCycle(board.getCycle())
             board1.collapseUncertainty(choice1)
-            child1 = Node.Node(node, board1, [line1, col1], [line2, col2])
+            child1 = Node.Node(node, board1, [line, col])
 
             board2 = Q.QuantumTicTacToe()  # create a new board with the same cycle
             board2.copyTiles(board.getBoard())
             board2.copyCycle(board.getCycle())
             board2.collapseUncertainty(choice2)
-            child2 = Node.Node(node, board2, [line1, col1], [line2, col2])
+            child2 = Node.Node(node, board2, [line, col])
 
             return [child1, child2]
 
         else:
 
-            child = Node.Node(node, board, [line1, col1], [line2, col2])
+            child = Node.Node(node, board, [line, col])
             return [child]
 
     def minimax(self, node, depth, maximizing):
@@ -169,7 +150,12 @@ class Minimax(Alg.Algorithms):
             self.generateChildren(node, self.piece, index)  # it's my turn
             maxEval = -inf
             for child in node.children:
-                eval = self.pruningMinimax(child, depth - 1, alpha, beta, False, index + 1)
+                if not self.quantum:
+                    eval = self.pruningMinimax(child, depth - 1, alpha, beta, False, index + 1)
+                else:
+                    self.banana += 1
+                    if self.banana % 2 == 0:
+                        eval = self.pruningMinimax(child, depth - 1, alpha, beta, False, index + 1)
                 maxEval = max(maxEval, eval)
                 alpha = max(alpha, eval)
                 if beta <= alpha:
@@ -181,7 +167,12 @@ class Minimax(Alg.Algorithms):
             self.generateChildren(node, self.other, index)  # it's your turn
             minEval = inf
             for child in node.children:
-                eval = self.pruningMinimax(child, depth - 1, alpha, beta, True, index + 1)
+                if not self.quantum:
+                    eval = self.pruningMinimax(child, depth - 1, alpha, beta, True, index + 1)
+                else:
+                    self.banana += 1
+                    if self.banana % 2 == 0:
+                        eval = self.pruningMinimax(child, depth - 1, alpha, beta, True, index + 1)
                 minEval = min(minEval, eval)
                 beta = min(beta, eval)
                 if beta <= alpha:

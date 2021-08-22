@@ -156,19 +156,11 @@ if __name__ == '__main__':
             elif computer and game and int(index) % 2 == 1 - remainder and \
                     not choosing and qb.getWinner() == "banana":
 
-                # sa = SA.SimpleAlgorithm(sb, player)  # initialize the simple opponent
                 sa = SA.Minimax(qb, player, True, int(index))  # initialize the minimax opponent
-
                 coord = sa.getMove()
 
-                if first:
-                    line = coord[0][0]
-                    col = coord[0][1]
-                    first = False
-                else:
-                    line = coord[1][0]
-                    col = coord[1][1]
-                    first = True
+                line = coord[0]
+                col = coord[1]
                 qb.play(line, col, player + str(int(index)))
 
                 # Update the first move

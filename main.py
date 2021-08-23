@@ -156,7 +156,8 @@ if __name__ == '__main__':
             elif computer and game and int(index) % 2 == 1 - remainder and \
                     not choosing and qb.getWinner() == "banana":
 
-                sa = SA.Minimax(qb, player, True, int(index))  # initialize the minimax opponent
+                sa = SA.Minimax(qb, player, True, first, int(index))  # initialize the minimax opponent
+                first = first is False
                 coord = sa.getMove()
 
                 line = coord[0]

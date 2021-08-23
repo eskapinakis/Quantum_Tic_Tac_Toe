@@ -141,9 +141,6 @@ class QuantumTicTacToe(Board.Board):
             self.counters[line][col] += ' ' + player
             self.tiles[line][col] += ' ' + player
 
-            # if self.sameSymbol(line, col):
-            #    self.tiles[line][col] = self.tiles[line][col][0]
-
     def findIndex(self, index, current_tile):  # finds the other tile where the index is
         for i in range(3):
             for j in range(3):

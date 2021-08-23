@@ -21,7 +21,7 @@ class Minimax(Alg.Algorithms):
         self.index = index
 
         if quantum:
-            self.depth = 6
+            self.depth = 2
         else:
             self.depth = 6
 
@@ -98,7 +98,7 @@ class Minimax(Alg.Algorithms):
         child = Node.Node(node, board, [line, col])
         # child.getBoard().printBoard()
 
-        """if board.hasCycle(line, col):  # if there was a cycle 
+        """if board.hasCycle(line, col):  # if there was a cycle
 
             tile = board.getTile(line, col)
             choice1 = tile[0]+tile[1]
@@ -116,9 +116,7 @@ class Minimax(Alg.Algorithms):
             board2.collapseUncertainty(choice2)
             child2 = Node.Node(node, board2, [line, col])
 
-            return [child1, child2]
-
-        else:"""
+            return [child1, child2]"""
 
         return [child]
 

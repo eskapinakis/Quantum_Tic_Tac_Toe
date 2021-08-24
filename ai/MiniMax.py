@@ -21,7 +21,7 @@ class Minimax(Alg.Algorithms):
         self.index = index
 
         if quantum:
-            self.depth = 2
+            self.depth = 5
         else:
             self.depth = 6
 
@@ -74,49 +74,80 @@ class Minimax(Alg.Algorithms):
 
     # only the next generation
     def generateQuantumChildren(self, node, player, index):
-        for i in range(9):
-            line = self.getCoordinates(i)[0]  # get the first move
-            col = self.getCoordinates(i)[1]
 
-            board = Q.QuantumTicTacToe()  # create a new board
-            board.copyTiles(node.getBoard().getBoard())
+        # """
+        if node.isCollapsed():  # if there is a cycle in the node
 
-            if not board.isOccupied(line, col):
-                board.play(line, col, player+str(index))
-                children = self.makeBabies(node, board, line, col)  # because a choice can have 2 consequences
-                for child in children:
-                    node.addChildren(child)
+            board = node.getBoard()  # get information from daddy
+            coord = node.getMove()
+            line = coord[0]
+            col = coord[1]
+
+            tile = board.getTile(line, col)  # get te tile where choices will be made
+            choice1 = tile[0]+tile[1]
+            choice2 = tile[3]+tile[4]
+
+            # create the board for the first choice
+            board1 = Q.QuantumTicTacToe()
+            board1.copyTiles(board.getBoard())
+            board1.copyCycle(board.getCycle())
+            board1.collapseUncertainty(choice1)
+
+            # create the board for the second choice
+            board2 = Q.QuantumTicTacToe()
+            board2.copyTiles(board.getBoard())
+            board2.copyCycle(board.getCycle())
+            board2.collapseUncertainty(choice2)
+
+            for i in range(9):
+                line = self.getCoordinates(i)[0]  # get the first move
+                col = self.getCoordinates(i)[1]
+
+                newBoard1 = Q.QuantumTicTacToe()  # copy the first board
+                newBoard1.copyTiles(board1.getBoard())
+                newBoard2 = Q.QuantumTicTacToe()  # copy the second board
+                newBoard2.copyTiles(board2.getBoard())
+
+                if not newBoard1.isOccupied(line, col):
+                    newBoard1.play(line, col, player + str(index))
+                    children = self.makeBabies(node, newBoard1, line, col)  # to refine the babies
+                    for child in children:
+                        node.addChildren(child)
+
+                if not newBoard2.isOccupied(line, col):
+                    newBoard2.play(line, col, player + str(index))
+                    children = self.makeBabies(node, newBoard2, line, col)  # to refine the babies
+                    for child in children:
+                        node.addChildren(child)
+        # """
+        else:
+            for i in range(9):
+                line = self.getCoordinates(i)[0]  # get the first move
+                col = self.getCoordinates(i)[1]
+
+                board = Q.QuantumTicTacToe()  # create a new board
+                board.copyTiles(node.getBoard().getBoard())
+
+                if not board.isOccupied(line, col):
+                    board.play(line, col, player+str(index))
+                    children = self.makeBabies(node, board, line, col)  # to refine the babies
+                    for child in children:
+                        node.addChildren(child)
 
     @staticmethod
     def makeBabies(node, board, line, col):
+
+        child = Node.Node(node, board, [line, col])  # basic stuff
 
         if board.sameSymbol(line, col):  # if the move was deterministic
             move = board.getTile(line, col)[0]
             board.eraseMove(line, col)
             board.play(line, col, move)
+            child = Node.Node(node, board, [line, col])
 
-        child = Node.Node(node, board, [line, col])
-        # child.getBoard().printBoard()
-
-        """if board.hasCycle(line, col):  # if there was a cycle
-
-            tile = board.getTile(line, col)
-            choice1 = tile[0]+tile[1]
-            choice2 = tile[3]+tile[4]
-
-            board1 = Q.QuantumTicTacToe()  # create a new board with the same cycle
-            board1.copyTiles(board.getBoard())
-            board1.copyCycle(board.getCycle())
-            board1.collapseUncertainty(choice1)
-            child1 = Node.Node(node, board1, [line, col])
-
-            board2 = Q.QuantumTicTacToe()  # create a new board with the same cycle
-            board2.copyTiles(board.getBoard())
-            board2.copyCycle(board.getCycle())
-            board2.collapseUncertainty(choice2)
-            child2 = Node.Node(node, board2, [line, col])
-
-            return [child1, child2]"""
+        elif board.hasCycle(line, col):
+            # the child will have two extra children
+            child = Node.Node(node, board, [line, col], collapsed=True)
 
         return [child]
 

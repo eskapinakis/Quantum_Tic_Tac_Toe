@@ -4,17 +4,16 @@ class Node:
     board = None
     move = None
     move2 = None
+    collapsed = False
     children = []
 
-    def __init__(self, node=None, board=None, move=None, move2=None):
+    def __init__(self, node=None, board=None, move=None, move2=None, collapsed=False):
         self.children = []
         self.father = node
         self.board = board
         self.move = move
         self.move2 = move2
-
-    def getIndex(self):
-        return self.index
+        self.collapsed = collapsed
 
     def getBoard(self):
         return self.board
@@ -53,3 +52,6 @@ class Node:
 
     def isFull(self):
         return self.board.isFull()
+
+    def isCollapsed(self):
+        return self.collapsed

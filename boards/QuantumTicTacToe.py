@@ -96,6 +96,8 @@ class QuantumTicTacToe(Board.Board):
     @staticmethod
     def getSmallestBiggest(line1, line2):
 
+        # print(line1, line2)
+
         max1 = 0  # get the biggest index in the first line
         for tile in line1:
             if int(tile[1]) > max1:

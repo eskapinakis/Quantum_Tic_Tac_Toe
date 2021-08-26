@@ -1,5 +1,5 @@
 from boards import Board
-
+import copy
 
 class QuantumTicTacToe(Board.Board):
 
@@ -38,6 +38,11 @@ class QuantumTicTacToe(Board.Board):
         return self.winingLine
 
     def getWinner(self):
+
+        # print(line1, line2)  TODO - Printing
+        # self.printBoard()
+        # print(self.counters)
+
         oVictory = False
         xVictory = False
 
@@ -96,7 +101,9 @@ class QuantumTicTacToe(Board.Board):
     @staticmethod
     def getSmallestBiggest(line1, line2):
 
-        # print(line1, line2)
+        # print(line1, line2)  TODO - Printing
+        # self.printBoard()
+        # print(self.counters)
 
         max1 = 0  # get the biggest index in the first line
         for tile in line1:
@@ -135,12 +142,17 @@ class QuantumTicTacToe(Board.Board):
     def getCounters(self):
         return self.counters
 
-    def play(self, line, col, player):
+    def copyCounters(self, counters):
+        self.counters = copy.deepcopy(counters)
+
+    def play(self, line, col, player, replacing=False):
         if self.tiles[line][col] == '':
-            self.counters[line][col] = player
+            if not replacing:  # in minimax we remove and add a piece but want to leave in in counters
+                self.counters[line][col] = player
             self.tiles[line][col] = player
         else:
-            self.counters[line][col] += ' ' + player
+            if not replacing:
+                self.counters[line][col] += ' ' + player
             self.tiles[line][col] += ' ' + player
 
     def findIndex(self, index, current_tile):  # finds the other tile where the index is

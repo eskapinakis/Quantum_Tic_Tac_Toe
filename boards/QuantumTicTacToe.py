@@ -1,6 +1,7 @@
 from boards import Board
 import copy
 
+
 class QuantumTicTacToe(Board.Board):
 
     counters = []  # this keeps tabs on the index of each move

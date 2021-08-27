@@ -40,9 +40,12 @@ class Minimax(Alg.Algorithms):
 
         for child in self.root.getChildren():
             eval = self.pruningMinimax(child, self.depth, -inf, inf, self.first, index, first=not self.first)
+            # print(eval)  TODO - printing
+            # child.getBoard().printBoard()
             if eval > best:
                 bestChild = child
                 best = eval
+        # print(best, '\n')  # TODO - printing
         return bestChild.getMove()
 
     def evalTerminal(self, node):
@@ -82,15 +85,16 @@ class Minimax(Alg.Algorithms):
         # """
         if node.isCollapsed():  # if there is a cycle in the node
 
-            boards = self.makeCollapsedBoard(node)
+            boards = self.makeCollapsedBoard(node)  # create the two possible boards
             board1 = boards[0]
             board2 = boards[1]
             # board1.printBoard()  # TODO - printing
             # board2.printBoard()
 
-            for i in range(9):
-                line = self.getCoordinates(i)[0]  # get the first move
-                col = self.getCoordinates(i)[1]
+            for i in self.preference:  # range(9):
+                coord = self.getCoordinates(i)
+                line = coord[0]
+                col = coord[1]
 
                 # copy the first board to create a child
                 newBoard1 = Q.QuantumTicTacToe()
@@ -115,9 +119,10 @@ class Minimax(Alg.Algorithms):
                         node.addChildren(child)
 
         else:
-            for i in range(9):
-                line = self.getCoordinates(i)[0]  # get the first move
-                col = self.getCoordinates(i)[1]
+            for i in self.preference:  # range(9):
+                coord = self.getCoordinates(i)
+                line = coord[0]
+                col = coord[1]
 
                 board = Q.QuantumTicTacToe()  # create a new board
                 board.copyTiles(node.getBoard().getBoard())

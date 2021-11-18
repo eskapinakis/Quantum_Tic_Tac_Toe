@@ -40,10 +40,6 @@ class QuantumTicTacToe(Board.Board):
 
     def getWinner(self):
 
-        # print(line1, line2)  TODO - Printing
-        # self.printBoard()
-        # print(self.counters)
-
         oVictory = False
         xVictory = False
 
@@ -101,10 +97,6 @@ class QuantumTicTacToe(Board.Board):
 
     @staticmethod
     def getSmallestBiggest(line1, line2):
-
-        # print(line1, line2)  TODO - Printing
-        # self.printBoard()
-        # print(self.counters)
 
         max1 = 0  # get the biggest index in the first line
         for tile in line1:
@@ -167,6 +159,13 @@ class QuantumTicTacToe(Board.Board):
         tile = self.tiles[tileCoordinates[0]][tileCoordinates[1]]
         return [str(tile[0]) + str(tile[1]), str(tile[3]) + str(tile[4])]
 
+    def hasCycle1(self):
+        for i in range(3):
+            for j in range(3):
+                if self.hasCycle(i, j):
+                    return True
+        return False
+
     def hasCycle(self, line, col):  # checks if there is a cycle starting in this tile
         if self.sameSymbol(line, col):
             return False
@@ -219,6 +218,8 @@ class QuantumTicTacToe(Board.Board):
             return True
 
     def collapseUncertainty(self, choice):
+
+        # print(self.cycle)  # PRINTING
 
         i = len(self.cycle)-1
         tileCoordinate = self.cycle[i]

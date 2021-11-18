@@ -4,15 +4,13 @@ import PySimpleGUI as sg
 # from ai import SimpleAlgorithm as SA  # To use the simple algorithm
 from ai import MiniMax as SA  # To use the minimax algorithm
 
-
 quantum = True  # make it true or false if tic tac toe is supposed to be quantum or not
 computer = True  # make it true or false to play against computer or not
 computerFirst = False  # make it true or false for the computer to play first
 
 
 def makeLayout(is_quantum=False, two_players=False):
-
-    # these are for the use to choose the kind of game
+    # these are for the user to choose the kind of game
     if is_quantum:
         return [[sg.Button('Quantum', key='quantum', auto_size_button=False, size=(8, 4)),
                  sg.Button('Regular', key='regular', auto_size_button=False, size=(7, 4))]
@@ -55,7 +53,6 @@ qb = Q.QuantumTicTacToe()  # quantum board
 
 
 def menu():
-
     isQuantum = False
     isComputer = False
 
@@ -79,6 +76,12 @@ def menu():
     return [isQuantum, isComputer]
 
 
+def refreshWindow():
+    for i in range(3):
+        for j in range(3):
+            window.FindElement(str(i + 1) + str(j + 1)).Update(text=qb.getTile(i, j))
+
+
 if __name__ == '__main__':
 
     player = 'O'
@@ -97,25 +100,16 @@ if __name__ == '__main__':
                        size=(400, 510), font='Any 14').Layout(makeLayout())
 
     if computerFirst:
-        window.Finalize()
+        window.Finalize()  # don't wait for input
 
     while True:
 
-        # print('Main Board')
-        # qb.printBoard()
-        # print(qb.isOccupied(0, 0))
-        # print(sb.isFull())
-        # printBoard(sb.getCounters())
-        # print('col: ', sb.getWinCol())
-        # print('line: ', sb.getWinLine())
-        # print(index)
-
-        event = "Banana"  # This is just to not have a yellow warning
-
-        if computerFirst:  # To define the first player
-            remainder = 1
+        if computerFirst:  # defines the first player
+            remainder = 1  # it's here for when you wanna play again
         else:
             remainder = 0
+
+        event = "Banana"  # This is just to not have a yellow warning
 
         # only ask for user input when it's the player's turn
         if not computer or not game or choosing:
@@ -145,11 +139,7 @@ if __name__ == '__main__':
                     col = int(event[1]) - 1
 
                     qb.play(line, col, player + str(int(index)))
-                    if window[event].get_text() == '':
-                        window[event].update(text=player + str(int(index)))
-                    else:
-                        window[event].update(text=window[event].get_text() + ' ' +
-                                                  player + str(int(index)))
+                    refreshWindow()
                     index += 0.5
 
             # if second player is the computer
@@ -158,40 +148,40 @@ if __name__ == '__main__':
 
                 sa = SA.Minimax(qb, player, True, first, int(index))  # initialize the minimax opponent
                 first = first is False
-                coord = sa.getMove()
 
-                line = coord[0]
-                col = coord[1]
-                qb.play(line, col, player + str(int(index)))
-
-                # Update the first move
-                name = str(line + 1) + str(col + 1)
-                text = window.FindElement(name).get_text()
-                if text == '':
-                    window.FindElement(name).update(text=player + str(int(index)))
+                if not qb.isKindaFull():
+                    result = sa.getFirstMove(line, col)  # move and the board
+                    qb.copyCounters(result[1].getCounters())
+                    qb.copyTiles(result[1].getBoard())
+                    line = result[0][0]  # To update the line and col
+                    col = result[0][1]
                 else:
-                    window.FindElement(name).update(text=text + ' ' + player + str(int(index)))
+                    result = sa.justReturnBestCollapse(line, col)  # move and the board
+                    qb.copyTiles(result.getBoard())
+
+                # update the board
+                refreshWindow()
                 index += 0.5
 
-            if index % 2 == 0 or index % 2 == 1:  # checks if there is a cycle
-
+            # checks if there is a baby cycle
+            if index % 2 in [0, 1]:
                 if qb.sameSymbol(line, col):
                     name = str(line + 1) + str(col + 1)
                     window.FindElement(name).update(text=qb.getTile(line, col))
 
+            # when you can choose to break the big cycle
+            if index % 2 == remainder:
                 if qb.hasCycle(line, col):
                     choosing = True
                     message = qb.getMessage()
                     window.FindElement('c1').Update(text=message[0])
                     window.FindElement('c2').Update(text=message[1])
 
+            # to get the choice from the user
             if choosing and event in ['c1', 'c2']:
                 choosing = False
                 qb.collapseUncertainty(window[event].get_text())  # collapse uncertainty
-                for i in range(3):
-                    for j in range(3):
-                        window.FindElement(str(i + 1) + str(j + 1)).Update(text=qb.getTile(i, j))
-
+                refreshWindow()
                 window.FindElement('c1').Update(text='')
                 window.FindElement('c2').Update(text='')
 
@@ -241,7 +231,7 @@ if __name__ == '__main__':
                 # sa = SA.SimpleAlgorithm(sb, player)  # initialize the simple opponent
                 sa = SA.Minimax(rb, player)  # initialize the minimax opponent
 
-                coord = sa.getMove()
+                coord = sa.getFirstMove()[0]
                 line = coord[0]
                 col = coord[1]
                 rb.play(line, col, player)

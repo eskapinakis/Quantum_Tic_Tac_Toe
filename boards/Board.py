@@ -66,6 +66,13 @@ class Board:
     def isFull(self):
         for i in range(3):
             for j in range(3):
+                if len(self.tiles[i][j]) != 1:
+                    return False
+        return True
+
+    def isKindaFull(self):
+        for i in range(3):
+            for j in range(3):
                 if not self.isOccupied(i, j):
                     return False
         return True
